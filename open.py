@@ -15,6 +15,19 @@ from matplotlib.colors import LinearSegmentedColormap
 import glob
 import moviepy.editor as mp
 
+
+# speed by code - vectorise
+# make better output plots - height of sun cartoon etc
+# stitch two tif files together
+# garden anlysis - sell app to rightmove lol
+
+
+
+
+
+
+
+
 sun_color = '#FFD700'  # Brighter yellow color for sun
 shade_color = '#121110'  # Darker blue color for shade
 
@@ -45,12 +58,12 @@ tif_data_full = tif_data.copy()
 # idx = (idx[1], -idx[0])
 
 
-pub = [51.467334, -2.586485] # cadbury
+# pub = [51.467334, -2.586485] # cadbury
 # pub = [51.468803, -2.593292] # cat and wheel
-# pub = [51.453291, -2.609596] # hope and anchor
+pub = [51.453291, -2.609596] # hope and anchor
 # pub = [51.455028, -2.590344] # castle park
 
-pub_name = "Cadbury"
+pub_name = "Hope and Anchor (large winter)"
 
 output_gif = f"output_{pub_name.replace(' ','_')}"
 
@@ -79,7 +92,7 @@ def compute_angle_from_north(origin_x, origin_y, points_x, points_y):
     return angles
 
 
-def select_elements_within_angle(array, angle, cone=5):
+def select_elements_within_angle(array, angle, cone=5, N_surrounding_pixels=50):
 
     array[np.where(array<0)] += 360
 
@@ -95,7 +108,7 @@ def select_elements_within_angle(array, angle, cone=5):
     else:
         where = np.where(np.logical_or(array < lower_bound, array > upper_bound))
 
-    row_to_remove = [45, 45]
+    row_to_remove = [N_surrounding_pixels, N_surrounding_pixels]
     to_delete = np.where((where[0] == row_to_remove[0]) & (where[1] == row_to_remove[1]))
     where = np.delete(where, to_delete, axis=1)
     where = (np.asarray(where[0]), np.asarray(where[1]))
@@ -115,16 +128,15 @@ def compute_angle_from_horizontal(origin_x, origin_y, points_x, points_y, curren
     return angles
 
 
-def _is_sunny(y_point, x_point, date, time, longitude, latitude, blur=True):
+def _is_sunny(y_point, x_point, date, time, longitude, latitude, blur=True, N_surrounding_pixels=50):
 
-    N_pixels = 45 # number of metres around point
-    tif_data = tif_data_full[y_point-N_pixels:y_point+N_pixels,x_point-N_pixels:x_point+N_pixels]
+    tif_data = tif_data_full[y_point-N_surrounding_pixels:y_point+N_surrounding_pixels,x_point-N_surrounding_pixels:x_point+N_surrounding_pixels]
 
 
     tif_data = np.expand_dims(tif_data, -1)
 
-    rows = np.arange(N_pixels*2).reshape(N_pixels*2, 1)
-    cols = np.arange(N_pixels*2).reshape(1, N_pixels*2)
+    rows = np.arange(N_surrounding_pixels*2).reshape(N_surrounding_pixels*2, 1)
+    cols = np.arange(N_surrounding_pixels*2).reshape(1, N_surrounding_pixels*2)
     meshgrid_rows, meshgrid_cols = np.meshgrid(rows, cols)
     result_array = np.stack((meshgrid_cols,meshgrid_rows), axis=2)
 
@@ -132,8 +144,8 @@ def _is_sunny(y_point, x_point, date, time, longitude, latitude, blur=True):
 
     azimuth, altitude = compute_sun_direction(date, time, latitude, longitude)
 
-    angles = compute_angle_from_north(45, 45, tif_data[:,:,1], tif_data[:,:,2])
-    where = select_elements_within_angle(angles, azimuth, 5)
+    angles = compute_angle_from_north(N_surrounding_pixels, N_surrounding_pixels, tif_data[:,:,1], tif_data[:,:,2])
+    where = select_elements_within_angle(angles, azimuth, 5, N_surrounding_pixels)
 
     tif_data = tif_data[:,:,0]
     tif_data[where] = 0
@@ -143,7 +155,7 @@ def _is_sunny(y_point, x_point, date, time, longitude, latitude, blur=True):
     # if blur:
     #     tif_data[:,:,0] = gaussian_filter(tif_data[:,:,0], sigma=0.5)
 
-    angle_to_horizontal = compute_angle_from_horizontal(45, 45, tif_data[:,:,1], tif_data[:,:,2], tif_data[45,45,0], tif_data[:,:,0])
+    angle_to_horizontal = compute_angle_from_horizontal(N_surrounding_pixels, N_surrounding_pixels, tif_data[:,:,1], tif_data[:,:,2], tif_data[N_surrounding_pixels,N_surrounding_pixels,0], tif_data[:,:,0])
 
     if np.amax(angle_to_horizontal) < altitude:
         sunny = 1 # True
@@ -163,6 +175,7 @@ y_point_gps, x_point_gps = rasterio.transform.rowcol(transform, -idx[1], idx[0])
 print(y_point_gps, x_point_gps)
 
 date = '2023/06/21'  # Date format: yyyy/mm/dd
+# date = '2023/01/21'  # Date format: yyyy/mm/dd
 latitude = f'{pub[0]}'   # Latitude of the location
 longitude = f'{pub[1]}'  # Longitude of the location
 
@@ -176,7 +189,7 @@ for hour in range(10,21):
         
         print(time)
 
-        steps = 10
+        steps = 100 # size of area to compute shadows
 
         is_sunny_array = np.zeros(np.shape(tif_data_full))
 
@@ -185,7 +198,9 @@ for hour in range(10,21):
                 is_sunny, azimuth = _is_sunny(y_point_i, x_point_i, date, time, longitude, latitude)
                 is_sunny_array[y_point_i][x_point_i] = is_sunny
 
-        N_pixels = 25 # number of metres around point
+
+
+        N_pixels = 125 # number of metres around point to plot
         tif_data_i = tif_data_full[y_point_gps-N_pixels:y_point_gps+N_pixels,x_point_gps-N_pixels:x_point_gps+N_pixels]
         is_sunny_array_i = is_sunny_array[y_point_gps-N_pixels:y_point_gps+N_pixels,x_point_gps-N_pixels:x_point_gps+N_pixels]
 
@@ -199,26 +214,25 @@ for hour in range(10,21):
 
         ax = plt.subplot(1,2,1)
         plt.imshow(tif_data_i, norm=LogNorm())
-        rect = patches.Rectangle((14.5, 14.5), 21, 21, linewidth=2, edgecolor='red', facecolor='none')
+        rect = patches.Rectangle((N_pixels-steps-0.5, N_pixels-steps-0.5), steps*2+1, steps*2+1, linewidth=2, edgecolor='red', facecolor='none')
         ax.add_patch(rect)
         angle_radians = np.radians(azimuth)
-        line_length = 50
+        line_length = N_pixels*4
         x_endpoint = -line_length * np.cos(angle_radians)
         y_endpoint = line_length * np.sin(angle_radians)
-        ax.plot([24.5, 24.5 + y_endpoint], [24.5, 24.5 + x_endpoint], color='red')
+        ax.plot([N_pixels-0.5, N_pixels-0.5 + y_endpoint], [N_pixels-0.5, N_pixels-0.5 + x_endpoint], color='red')
         plt.xlim(0-0.5, N_pixels*2-0.5)
         plt.ylim(N_pixels*2-0.5,-0.5)
 
         ax = plt.subplot(1,2,2)
         plt.imshow(tif_data_i, norm=LogNorm())
         plt.imshow(is_sunny_array_i_blur, cmap=cmap, alpha=0.5)
-        rect = patches.Rectangle((14.5, 14.5), 21, 21, linewidth=2, edgecolor='red', facecolor='none')
+        rect = patches.Rectangle((N_pixels-steps-0.5, N_pixels-steps-0.5), steps*2+1, steps*2+1, linewidth=2, edgecolor='red', facecolor='none')
         ax.add_patch(rect)
 
         plt.tight_layout()        
         plt.savefig(f'temp/plot_{time_iter}.png')
         plt.close('all')
-
 
 
 image_files = glob.glob('temp/plot_*.png')
