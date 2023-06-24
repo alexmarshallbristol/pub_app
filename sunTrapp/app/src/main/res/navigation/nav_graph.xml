@@ -7,7 +7,7 @@
 
     <fragment
         android:id="@+id/fragmentRealTime"
-        android:name="com.example.progettoembedded.RealTimeFragment"
+        android:name="com.example.sunTrapp.RealTimeFragment"
         android:label="@string/menu_item_live"
         tools:layout="@layout/fragment_real_time">
         <action
@@ -17,7 +17,7 @@
 
     <fragment
         android:id="@+id/fragmentList"
-        android:name="com.example.progettoembedded.ChartFragment"
+        android:name="com.example.sunTrapp.ChartFragment"
         android:label="@string/menu_item_records"
         tools:layout="@layout/fragment_chart"/>
 </navigation>

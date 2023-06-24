@@ -10,7 +10,7 @@ android {
     compileSdk 32
 
     defaultConfig {
-        applicationId "com.example.progettoembedded"
+        applicationId "com.example.sunTrapp"
         minSdk 26
         targetSdk 32
         versionCode 1

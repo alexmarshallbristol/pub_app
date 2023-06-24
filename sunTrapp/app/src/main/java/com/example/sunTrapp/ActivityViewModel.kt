@@ -1,4 +1,4 @@
-package com.example.progettoembedded
+package com.example.sunTrapp
 
 import android.annotation.SuppressLint
 import androidx.lifecycle.ViewModel

@@ -1,4 +1,4 @@
-package com.example.progettoembedded
+package com.example.sunTrapp
 
 //import com.google.android.gms.location.LocationServices
 //import com.google.android.gms.location.FusedLocationProviderClient
@@ -6,28 +6,18 @@ package com.example.progettoembedded
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
-import android.content.IntentFilter
 import android.graphics.Bitmap
 import android.graphics.drawable.BitmapDrawable
-import android.graphics.drawable.Drawable
 import android.location.Location
 import android.os.Bundle
-import android.text.Html
-import android.text.method.LinkMovementMethod
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.AdapterView
-import android.widget.ArrayAdapter
-import android.widget.FrameLayout
 import android.widget.ImageView
-import androidx.cardview.widget.CardView
-import android.widget.Spinner
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.content.res.AppCompatResources
-import androidx.core.content.res.ResourcesCompat
 import androidx.core.graphics.drawable.toBitmap
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
@@ -39,7 +29,6 @@ import com.google.android.gms.maps.MapView
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.LatLng
-import com.google.android.gms.maps.model.LatLngBounds
 import com.google.android.gms.maps.model.MarkerOptions
 import kotlin.math.atan2
 import kotlin.math.cos
@@ -51,19 +40,8 @@ import java.util.*
 import java.io.File
 import com.chaquo.python.Python
 import com.chaquo.python.android.AndroidPlatform
-import android.graphics.BitmapFactory
 
-import android.view.inputmethod.InputMethodManager
-import android.widget.EditText
-import androidx.appcompat.app.AppCompatActivity
-import com.chaquo.python.PyException
-import android.webkit.WebView
-import android.net.Uri
 import com.bumptech.glide.Glide
-import java.io.ByteArrayInputStream
-
-import android.util.Base64
-import java.io.FileInputStream
 
 class RealTimeFragment : Fragment() {
     /**

@@ -1,4 +1,4 @@
-package com.example.progettoembedded
+package com.example.sunTrapp
 
 import android.Manifest
 import android.annotation.SuppressLint

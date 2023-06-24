@@ -1,4 +1,4 @@
-package com.example.progettoembedded
+package com.example.sunTrapp
 
 import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.ext.junit.runners.AndroidJUnit4
