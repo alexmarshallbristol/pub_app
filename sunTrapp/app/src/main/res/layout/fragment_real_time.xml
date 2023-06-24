@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    tools:context=".RealTimeFragment"
+    android:orientation="vertical">
+
+    <RelativeLayout
+        android:id="@+id/rel_map_view"
+        android:layout_width="match_parent"
+        android:layout_height="350dp">
+
+        <com.google.android.gms.maps.MapView
+            android:id="@+id/map_view"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+
+        <Button
+            android:id="@+id/map_centre_button"
+            android:layout_width="95dp"
+            android:layout_height="45dp"
+            android:layout_marginTop="15dp"
+            android:layout_marginStart="297dp"
+            android:text="Centre" />
+
+        <Button
+            android:id="@+id/reset_button"
+            android:layout_width="95dp"
+            android:layout_height="45dp"
+            android:layout_marginTop="60dp"
+            android:layout_marginStart="297dp"
+            android:text="Reset"
+            app:layout_constraintEnd_toEndOf="@+id/map_view"
+            app:layout_constraintTop_toTopOf="@+id/map_view" />
+
+    </RelativeLayout>
+
+    <ImageView
+        android:id="@+id/image_view_pyplot"
+        android:layout_width="match_parent"
+        android:layout_height="350dp"
+        android:src="@drawable/deg_0"
+        app:layout_constraintTop_toBottomOf="@id/rel_map_view"
+        app:layout_constraintBottom_toBottomOf="parent" />
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>

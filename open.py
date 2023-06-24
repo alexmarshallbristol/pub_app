@@ -18,6 +18,8 @@ import scipy
 from PIL import ImageFilter
 import time
 import datetime
+# from scipy.interpolate import CubicSpline
+from scipy.interpolate import make_interp_spline
 # speed by code - vectorise
 # make better output plots - height of sun cartoon etc
 # stitch two tif files together
@@ -47,6 +49,11 @@ tif_dataset = rasterio.open(tif_file)
 tif_data = tif_dataset.read(1)
 
 transform = tif_dataset.transform
+
+# np.save('tif/DSM_ST5570_P_10631_20190117_20190117.npy',tif_data)
+# with open('tif/DSM_ST5570_P_10631_20190117_20190117_transformer.pkl', 'wb') as f:
+#     pickle.dump(transform, f)
+
 crs = tif_dataset.crs
 
 height, width = tif_data.shape
@@ -324,10 +331,12 @@ steps = 15*upsampling # size of area to compute shadows
 buffer = int(steps/4.)
 boundaries_pixels = steps+buffer+boundaries_pixels
 
+sun_fraction = np.empty(0)
+
 time_iter = 0
 for hour in range(6,21):
-    # for minute in ['00']:
-    for minute in ['00', 15, 30, 45]:
+    for minute in ['00']:
+    # for minute in ['00', 15, 30, 45]:
     # for minute in ['00', '05', 10, 15, 20, 25, 30, 35, 40, 45, 50, 55]:
         time_iter += 1
         time_string = f'{hour}:{minute}:00'   # Time format: hh:mm:ss
@@ -454,7 +463,15 @@ for hour in range(6,21):
         # plt.show()
         plt.close('all')
 
+        sun_fraction = np.append(sun_fraction, np.mean(is_sunny_pad_garden[:,0]))
 
+# cs = CubicSpline(np.arange(len(sun_fraction)), sun_fraction)
+cs = make_interp_spline(np.arange(len(sun_fraction)), sun_fraction)
+plt.plot(np.arange(len(sun_fraction)), sun_fraction)
+xs = np.linspace(0,len(sun_fraction),250)
+plt.plot(xs, cs(xs), label="r")
+plt.savefig('sun_frac')
+plt.close('all')
 
 image_files = glob.glob('temp/plot_*.png')
 image_idx_max = 0
@@ -476,10 +493,10 @@ for image_file in image_files:
     frames.append(image)
 
 # Save frames as an animated GIF
-frames[0].save(output_gif+".gif", format='GIF', append_images=frames[1:], save_all=True, duration=200*2, loop=0)
-clip = mp.VideoFileClip(output_gif+".gif")
+frames[0].save("gif/"+output_gif+".gif", format='GIF', append_images=frames[1:], save_all=True, duration=200*2, loop=0)
+clip = mp.VideoFileClip("gif/"+output_gif+".gif")
 clip.write_videofile(f"mp4/{output_gif}.mp4")
 
 # os.system('rm temp/plot_*.png')
-os.system('rm *.gif')
+# os.system('rm *.gif')
 

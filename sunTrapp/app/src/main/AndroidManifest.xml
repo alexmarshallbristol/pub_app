@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.example.progettoembedded">
+
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+
+    <!--
+    Since API level 28, apps wanting to use foreground services must request the
+    FOREGROUND_SERVICE permission.
+    This is a normal permission, so the system automatically grants it.
+    https://developer.android.com/about/versions/pie/android-9.0-migration#tya
+    -->
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+
+    <application
+        android:allowBackup="true"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:roundIcon="@mipmap/ic_launcher_round"
+        android:supportsRtl="true"
+        android:theme="@style/Theme.ProgettoEmbedded"
+        >
+
+    <!--
+         Before you run your application, you need a Google Maps API key.
+
+         To get one, follow the directions here:
+
+            https://developers.google.com/maps/documentation/android-sdk/get-api-key
+
+         Once you have your API key (it starts with "AIza"), define a new property in your
+         project's local.properties file (e.g. MAPS_API_KEY=Aiza...), and replace the
+         "YOUR_API_KEY" string in this file with "${MAPS_API_KEY}".
+    -->
+        <meta-data
+            android:name="com.google.android.geo.API_KEY"
+            android:value="AIzaSyBbngN_VCGUbLyOBYpn1FepIDJYCsmr-GA" />
+
+        <activity
+            android:name=".MainActivity"
+            android:exported="true"
+            android:configChanges="orientation">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="LISTUPDATED"/>
+                <category android:name="android.intent.category.DEFAULT"/>
+            </intent-filter>
+            <intent-filter>
+                <action android:name="NEWSAMPLE"/>
+                <category android:name="android.intent.category.DEFAULT"/>
+            </intent-filter>
+        </activity>
+
+        <!-- We created a foreground service able to retrieve the location.
+        By setting exported=false we prevent any other app to access this service (it retrieves sensitive information (the location) that
+        must be used only by the app itself).-->
+        <service
+            android:name=".ReaderService"
+            android:foregroundServiceType="location"
+            android:enabled="true"
+            android:exported="false">
+        </service>
+    </application>
+
+</manifest>

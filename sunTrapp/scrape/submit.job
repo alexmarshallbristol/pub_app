@@ -1,0 +1,18 @@
+job = trees
+executable = run
+universe = vanilla
+
+transfer_input_files = scrape.py
+
++JobFlavour = "nextweek"
+
+requirements=(OpSysAndVer == "CentOS7")
+environment ="id=$(Process) outputFolder=test"
+
+getenv = false
+
+log = LOG/job_R1_$(Process).log
+output = LOG/job_R1_$(Process).out
+error = LOG/job_R1_$(Process).err
+
+queue 5
