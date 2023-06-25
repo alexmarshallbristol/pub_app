@@ -8,6 +8,7 @@ import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.drawable.BitmapDrawable
+import android.graphics.drawable.Drawable
 import android.location.Location
 import android.os.Bundle
 import android.util.Log
@@ -18,6 +19,7 @@ import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.content.res.AppCompatResources
+import androidx.core.content.res.ResourcesCompat
 import androidx.core.graphics.drawable.toBitmap
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
@@ -42,6 +44,7 @@ import com.chaquo.python.Python
 import com.chaquo.python.android.AndroidPlatform
 
 import com.bumptech.glide.Glide
+import android.os.AsyncTask
 
 class RealTimeFragment : Fragment() {
     /**
@@ -145,9 +148,9 @@ class RealTimeFragment : Fragment() {
         if(!model.mBound)
             return
 
-        val sample = model.readerService!!.currentSample
+//        val sample = model.readerService!!.currentSample
         //Update the 3 cards shown at the top of the screen
-        updateCards(sample)
+//        updateCards(sample)
 //        //If latitude and longitude are valid
 //        if (sample.latitude != null && sample.longitude != null) {
 //            //if the map has been initialized
@@ -231,9 +234,14 @@ class RealTimeFragment : Fragment() {
             googleMap.addMarker(markerOptions)
             val loc = LocationDetails(latLng.longitude.toString(), latLng.latitude.toString(), "0.", Date(System.currentTimeMillis()))
             pause_updates = false
-            updateCards(loc, pause=true, red_label=true)
+
+            updateCards(latLng.longitude.toString(), latLng.latitude.toString())
         }
 
+
+        val pos = LatLng(51.4545, -2.5879)
+        val update = CameraUpdateFactory.newLatLngZoom(pos, 12.5f)
+        map.moveCamera(update)
 
         //insert the marker in the current position
         insertMarker()
@@ -370,6 +378,8 @@ override fun onDestroy() {
         mapView.onCreate(savedInstanceState)
         mapView.getMapAsync(callback)
 
+
+
         val button: Button = view.findViewById(R.id.map_centre_button)
         button.setOnClickListener {
 //            map.animateCamera(CameraUpdateFactory.newLatLngZoom(current_position, 15f))
@@ -395,17 +405,17 @@ override fun onDestroy() {
         if (! Python.isStarted()) {
             Python.start(AndroidPlatform(requireContext()))
         }
-        val py = Python.getInstance()
-        val module = py.getModule("plot")
-        val bytes = module.callAttr("plot_func").toJava(ByteArray::class.java)
-        // // plot image
-//        val bitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.size)
-//        pyplotImage.setImageBitmap(bitmap)
-
-        // // Load the animated GIF using Glide
-        val filePath = File(requireContext().filesDir, "gif_file.gif").absolutePath
-        Glide.with(requireContext()).asGif().load(filePath).into(pyplotImage)
-
+//        val py = Python.getInstance()
+//        val module = py.getModule("plot")
+//        val bytes = module.callAttr("plot_func").toJava(ByteArray::class.java)
+//        // // plot image
+////        val bitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.size)
+////        pyplotImage.setImageBitmap(bitmap)
+//
+//        // // Load the animated GIF using Glide
+//        val filePath = File(requireContext().filesDir, "gif_file.gif").absolutePath
+//        Glide.with(requireContext()).asGif().load(filePath).into(pyplotImage)
+//
 
 
 
@@ -541,20 +551,53 @@ override fun onDestroy() {
      * @param location location details to update the cards with. If any of the 3 components is null, that means that it was impossible to retrieve
      * the location. Therefore, we show that No data is available.
      */
-    private fun updateCards(location : LocationDetails, pause: Boolean = false, red_label: Boolean = false, force_with_last_position: Boolean = false)
+    private fun updateCards(latitude_in: String, longitude_in: String)
     {
 
         // UPDATES GO HERE
 
+        // // Load the animated GIF using Glide
+//        val loading_gif = resources.getDrawable(R.drawable.loading)
+//        val filePath = File(requireContext().filesDir, "gif_file.gif").absolutePath
 
+        val loading_gif = resources.getIdentifier("loading", "drawable", requireContext().packageName)
+        Glide.with(requireContext()).asGif().load(loading_gif).into(pyplotImage)
 
+        // Execute Python code in a background thread using AsyncTask
+        object : AsyncTask<Void, Void, ByteArray>() {
+            override fun doInBackground(vararg params: Void?): ByteArray {
+                val py = Python.getInstance()
+                val module = py.getModule("plot")
+                return module.callAttr("plot_func", latitude_in, longitude_in).toJava(ByteArray::class.java)
+            }
 
-        if(pause){
-            pause_updates=true
-        }
-        if(force_with_last_position) {
-            pause_updates=true
-        }
+            override fun onPostExecute(result: ByteArray?) {
+                super.onPostExecute(result)
+                // Update the ImageView with the result image on the UI thread
+                if (result != null) {
+                    val filePath = File(requireContext().filesDir, "gif_file_"+latitude_in+"_"+longitude_in+".gif").absolutePath
+                    Glide.with(requireContext())
+                        .asGif()
+                        .load(filePath)
+                        .into(pyplotImage)
+                }
+            }
+        }.execute()
+
+//        val py = Python.getInstance()
+//        val module = py.getModule("plot")
+//        val bytes = module.callAttr("plot_func").toJava(ByteArray::class.java)
+//        // // plot image
+////        val bitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.size)
+////        pyplotImage.setImageBitmap(bitmap)
+//
+//        // // Load the animated GIF using Glide
+//        val filePath = File(requireContext().filesDir, "gif_file.gif").absolutePath
+//        Glide.with(requireContext()).asGif().load(filePath).into(pyplotImage)
+
     }
+
+
+
 }
 

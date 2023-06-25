@@ -8,8 +8,10 @@ class shadow_computer:
 
 		self.upsampling = upsampling
 		self.max_shadow_length = max_shadow_length
-		rows = np.arange(self.max_shadow_length*2+1).reshape(self.max_shadow_length*2+1, 1)
-		cols = np.arange(self.max_shadow_length*2+1).reshape(1, self.max_shadow_length*2+1)
+		# rows = np.arange(int(self.max_shadow_length*2+1)).reshape(int(self.max_shadow_length*2)+1, 1)
+		# cols = np.arange(int(self.max_shadow_length*2)+1).reshape(1, int(self.max_shadow_length*2)+1)
+		rows = np.arange(int(self.max_shadow_length*2+1)).reshape(int(self.max_shadow_length*2)+1, 1)
+		cols = np.arange(int(self.max_shadow_length*2)+1).reshape(1, int(self.max_shadow_length*2)+1)
 		meshgrid_rows, meshgrid_cols = np.meshgrid(rows, cols)
 		result_array = np.stack((meshgrid_cols,meshgrid_rows), axis=2)
 		angles = self.compute_angle_from_north(self.max_shadow_length, self.max_shadow_length, result_array[:,:,0], result_array[:,:,1])
@@ -87,16 +89,15 @@ class shadow_computer:
 
 		return result
 	
-	def compute(self, data, x_idx, y_idx, compute_size):
+	def compute(self, region_of_interest, x_idx, y_idx, compute_size, edge_buffer, upsampling):
 		
-		region_of_interest = data[int(y_idx-self.max_shadow_length-compute_size):int(y_idx+self.max_shadow_length+compute_size+1),int(x_idx-self.max_shadow_length-compute_size):int(x_idx+self.max_shadow_length+compute_size+1)]
+		region_of_interest = region_of_interest[int(edge_buffer):int(-edge_buffer),int(edge_buffer):int(-edge_buffer)]
 
 		is_sunny_angels = self.convolve2D_mask(region_of_interest, self.distance_to_centre, self.mask)
 		is_sunny = np.ones(np.shape(is_sunny_angels))
 		is_sunny[np.where(is_sunny_angels>self.altitude)] = 0.
 
-		region_of_interest = data[int(y_idx-compute_size):int(y_idx+compute_size+1),int(x_idx-compute_size):int(x_idx+compute_size+1)]
-
-
+		region_of_interest = region_of_interest[int(y_idx-compute_size-edge_buffer):int(y_idx+compute_size-edge_buffer+1*upsampling),int(x_idx-compute_size-edge_buffer):int(x_idx+compute_size-edge_buffer+1*upsampling)]
+	
 		return is_sunny, region_of_interest
 
