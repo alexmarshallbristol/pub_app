@@ -94,7 +94,7 @@ class shadow_computer:
 		return result
 	
 	def compute(self, region_of_interest, x_idx, y_idx, compute_size, edge_buffer, upsampling):
-		
+
 		region_of_interest = region_of_interest[int(edge_buffer):int(-edge_buffer),int(edge_buffer):int(-edge_buffer)]
 
 		is_sunny_angels = self.convolve2D_mask(region_of_interest, self.distance_to_centre, self.mask)
@@ -102,6 +102,7 @@ class shadow_computer:
 		is_sunny[np.where(is_sunny_angels>self.altitude)] = 0.
 
 		region_of_interest = region_of_interest[int(y_idx-compute_size[1]-edge_buffer):int(y_idx+compute_size[1]-edge_buffer+1*upsampling),int(x_idx-compute_size[0]-edge_buffer):int(x_idx+compute_size[0]-edge_buffer+1*upsampling)]
-	
+
+
 		return is_sunny, region_of_interest
 

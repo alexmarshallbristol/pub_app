@@ -194,17 +194,11 @@ def get_organised_data(loc, compute_size, edge_buffer, max_shadow_length, upsamp
 					data_pad[up_down_start:up_down_start+np.shape(data_new)[0],left_right_start:left_right_start+np.shape(data_new)[1]] = data_new
 
 	data = data_pad[int(y_idx-max_shadow_length-compute_size[1]-edge_buffer):int(y_idx+max_shadow_length+compute_size[1]+edge_buffer+1),int(x_idx-max_shadow_length-compute_size[0]-edge_buffer):int(x_idx+max_shadow_length+compute_size[0]+edge_buffer+1)]
-	if upsampling != 1.:
-		max_shadow_length *= upsampling
-		compute_size *= upsampling
-		edge_buffer *= upsampling
-	x_idx = int(max_shadow_length+compute_size[0]+edge_buffer)
-	y_idx = int(max_shadow_length+compute_size[1]+edge_buffer)
 
 	data[np.where(data<-1E3)] = -99
 	data = sunTrapp.image_tools.replace_zeros(data, value=-99)
 	
-	return data, x_idx, y_idx, idx_raw 
+	return data, idx_raw 
 
 
 def index_tif_files(fileNames, json_filepath):
