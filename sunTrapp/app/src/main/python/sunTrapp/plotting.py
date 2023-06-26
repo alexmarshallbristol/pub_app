@@ -2,6 +2,7 @@ import matplotlib.pyplot as plt
 import scipy.ndimage
 from matplotlib.colors import LinearSegmentedColormap
 import numpy as np
+from matplotlib.colors import LogNorm
 
 sun_color = '#FFD700'  # Brighter yellow color for sun
 shade_color = '#121110'  # Darker blue color for shade
@@ -15,6 +16,7 @@ def publish_plot(shadows, filename, overlay=None, time_string=None, date=None, s
 	plt.figure(figsize=(6,6))
 	ax = plt.gca()
 	if overlay is not None:
+		print('satellite:', np.shape(overlay), 'shadows', np.shape(shadows))
 		shadows = scipy.ndimage.zoom(shadows, np.shape(overlay)[0]/np.shape(shadows)[0], order=0)
 		plt.imshow(overlay)
 	plt.imshow(shadows, cmap=cmap, alpha=0.35, vmin=0, vmax=1)
@@ -37,23 +39,20 @@ def debug_plot(shadows, filename, region_of_interest, satellite, time_string=Non
 	plt.figure(figsize=(12*0.8,8*0.8))
 
 	plt.subplot(2,3,1)
-	plt.imshow(region_of_interest)
-	plt.yticks([],[])   
-	plt.xticks([],[]) 
+	plt.imshow(region_of_interest, vmin=0.1, vmax=100, norm=LogNorm())
+	plt.colorbar()
 
 	plt.subplot(2,3,2)
 	plt.imshow(satellite)
-	plt.yticks([],[])   
-	plt.xticks([],[]) 
+	plt.colorbar()
 
 	plt.subplot(2,3,3)
 	plt.imshow(shadows, cmap=cmap, vmin=0, vmax=1)
-	plt.yticks([],[])   
-	plt.xticks([],[]) 
+	plt.colorbar()
 
 	plt.subplot(2,3,4)
 	ax = plt.gca()
-	plt.imshow(region_of_interest)
+	plt.imshow(region_of_interest, vmin=0.1)
 	plt.imshow(shadows, cmap=cmap, alpha=0.35, vmin=0, vmax=1)
 	plt.yticks([],[])   
 	plt.xticks([],[]) 

@@ -3,6 +3,7 @@ import numpy as np
 from PIL import Image
 import cv2
 from PIL import ImageFilter
+from scipy.spatial.distance import cdist
 
 def upsample(data, upsampling):
 	data_raw = scipy.ndimage.zoom(data, upsampling, order=0)
@@ -20,6 +21,25 @@ def smooth_image(image_array, size=3):
 	image_array = ((image_array*_max)+_min)/255
 	return image_array
 
+def replace_zeros(array, value=0):
+    # Create a copy of the input array
+    replaced_array = np.copy(array)
+
+    # Find the indices of zero values in the array
+    zero_indices = np.argwhere(array == value)
+
+    # Iterate over each zero index
+    for zero_index in zero_indices:
+        # Compute the Euclidean distance between the zero index and all non-zero indices
+        distances = cdist([zero_index], np.argwhere(array != value))
+
+        # Find the index of the closest non-zero value
+        closest_index = np.unravel_index(np.argmin(distances), array.shape)
+
+        # Replace the zero value with the closest non-zero value
+        replaced_array[zero_index[0], zero_index[1]] = array[closest_index[0], closest_index[1]]
+
+    return replaced_array
 
 
 # def smooth_image(image_array, size=3):
