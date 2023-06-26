@@ -204,7 +204,7 @@ def get_organised_data(loc, compute_size, edge_buffer, max_shadow_length, upsamp
 	data[np.where(data<-1E3)] = -99
 	data = sunTrapp.image_tools.replace_zeros(data, value=-99)
 	
-	return data, x_idx, y_idx, idx_raw
+	return data, x_idx, y_idx, idx_raw 
 
 
 def index_tif_files(fileNames, json_filepath):

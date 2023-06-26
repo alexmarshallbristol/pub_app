@@ -43,7 +43,7 @@ def debug_plot(shadows, filename, region_of_interest, satellite, time_string=Non
 	plt.figure(figsize=(width*3,height*2))
 
 	plt.subplot(2,3,1)
-	plt.imshow(region_of_interest, vmin=0.1, vmax=100, norm=LogNorm())
+	plt.imshow(region_of_interest, norm=LogNorm())
 	# plt.colorbar()
 
 	plt.subplot(2,3,2)
