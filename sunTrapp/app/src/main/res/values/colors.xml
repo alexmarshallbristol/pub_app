@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="primary_200">#009933</color>
-    <color name="primary_500">#009933</color>
-    <color name="primary_700">#009933</color>
-    <color name="secondary_300">#009933</color>
-    <color name="secondary_500">#009933</color>
+    <color name="primary_200">#f5801f</color>
+    <color name="primary_500">#f5801f</color>
+    <color name="primary_700">#f5801f</color>
+    <color name="secondary_300">#f5801f</color>
+    <color name="secondary_500">#f5801f</color>
     <color name="white">#FFFFFFFF</color>
-    <color name="light_grey">#009933</color>
+    <color name="light_grey">#f5801f</color>
     <color name="default_text_color">#C0000000</color>
 </resources>

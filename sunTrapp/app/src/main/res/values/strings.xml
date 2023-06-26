@@ -12,7 +12,7 @@
     <string name="label_distance2">Bearing</string>
     <string name="label_distance3">Species</string>
     <string name="label_nodata"></string>
-    <string name="menu_item_live">Nearest Ancient Trees</string>
+    <string name="menu_item_live">sunTrapp</string>
     <string name="menu_item_records">Info</string>
     <string name="channel_name">Location Reader Service</string>
     <string name="channel_description">Location is being collected periodically</string>

@@ -1,4 +1,3 @@
-import rasterio
 from pyproj import Transformer
 import datetime
 import glob
@@ -9,40 +8,46 @@ import json
 import geopy.distance
 import sunTrapp.image_tools
 from math import radians, sin, cos, sqrt, atan2
+import pickle
+from os.path import dirname, join
 
-def get_organised_data(loc, compute_size, edge_buffer, max_shadow_length, upsampling):
+def check_coordinate_within_bounds(coordinate, bounds):
+	top_left = bounds['top_left']
+	top_right = bounds['top_right']
+	bottom_left = bounds['bottom_left']
+	bottom_right = bounds['bottom_right']
+
+	if (coordinate[0] >= bottom_left[0] and coordinate[0] <= top_left[0] and
+			coordinate[1] >= top_left[1] and coordinate[1] <= top_right[1]):
+		return True
+	else:
+		return False
+		
+def get_organised_data(loc, compute_size, edge_buffer, max_shadow_length, upsampling, app=False, file_app=None):
 
 	image_height = ((compute_size[1]+edge_buffer+max_shadow_length)*2+1)*upsampling
 	image_width = ((compute_size[0]+edge_buffer+max_shadow_length)*2+1)*upsampling
 	print(f"full image size: {image_width}, {image_height}")
 
+	if app:
+		with open(join(dirname(file_app), "bounds.json"), "r") as json_file:
+			bounds = json.load(json_file)
+	else:
+		with open("tif/bounds.json", "r") as json_file:
+			bounds = json.load(json_file)
 
-	with open("tif/bounds.json", "r") as json_file:
-		bounds = json.load(json_file)
-
-	def check_coordinate_within_bounds(coordinate, bounds):
-		top_left = bounds['top_left']
-		top_right = bounds['top_right']
-		bottom_left = bounds['bottom_left']
-		bottom_right = bounds['bottom_right']
-
-		if (coordinate[0] >= bottom_left[0] and coordinate[0] <= top_left[0] and
-				coordinate[1] >= top_left[1] and coordinate[1] <= top_right[1]):
-			return True
-		else:
-			return False
-		
 
 	file = False
 	for file_str in bounds:
-		# print(check_coordinate_within_bounds(loc, data[file_str]), file_str)
+
 		if check_coordinate_within_bounds(loc, bounds[file_str]):
 			file = file_str
 			file_info = bounds[file_str]
 			break
-
-	data, transform, dataset = open_tif_file(file)
-	x_idx, y_idx, idx_raw = get_centre_indexes(loc, transform, 1.)
+	
+	if app: data, transform = open_tif_file_app(file, file_app)
+	else: data, transform, dataset = open_tif_file(file)
+	x_idx, y_idx, idx_raw = get_centre_indexes(loc, transform, 1., app)
 
 
 
@@ -86,8 +91,9 @@ def get_organised_data(loc, compute_size, edge_buffer, max_shadow_length, upsamp
 			distance = geopy.distance.geodesic(file_info["top_left"], file_info_new["bottom_left"]).m
 
 			if distance < 50:
-
-				data_new, transform_new, dataset_new = open_tif_file(file_str_new)
+				
+				if app: data_new, transform_new = open_tif_file_app(file_str_new)
+				else: data_new, transform_new, dataset_new = open_tif_file(file_str_new)
 
 				up_down_start = padding_size-np.shape(data_new)[0] # top left
 				left_right_start = padding_size # top left
@@ -99,8 +105,9 @@ def get_organised_data(loc, compute_size, edge_buffer, max_shadow_length, upsamp
 
 				if distance < 50:
 				
-					data_new, transform_new, dataset_new = open_tif_file(file_str_new)
-					
+					if app: data_new, transform_new = open_tif_file_app(file_str_new)
+					else: data_new, transform_new, dataset_new = open_tif_file(file_str_new)
+
 					up_down_start = padding_size-np.shape(data_new)[0] # top left
 					left_right_start = padding_size-np.shape(data_new)[1] # top left
 					data_pad[up_down_start:up_down_start+np.shape(data_new)[0],left_right_start:left_right_start+np.shape(data_new)[1]] = data_new
@@ -117,7 +124,8 @@ def get_organised_data(loc, compute_size, edge_buffer, max_shadow_length, upsamp
 
 			if distance < 50:
 				
-				data_new, transform_new, dataset_new = open_tif_file(file_str_new)
+				if app: data_new, transform_new = open_tif_file_app(file_str_new)
+				else: data_new, transform_new, dataset_new = open_tif_file(file_str_new)
 
 				up_down_start = padding_size # top left
 				left_right_start = padding_size+shape_data[1] # top left
@@ -129,8 +137,9 @@ def get_organised_data(loc, compute_size, edge_buffer, max_shadow_length, upsamp
 
 				if distance < 50:
 					
-					data_new, transform_new, dataset_new = open_tif_file(file_str_new)
-					
+					if app: data_new, transform_new = open_tif_file_app(file_str_new)
+					else: data_new, transform_new, dataset_new = open_tif_file(file_str_new)
+
 					up_down_start = padding_size-np.shape(data_new)[0] # top left
 					left_right_start = padding_size+shape_data[1] # top left
 					data_pad[up_down_start:up_down_start+np.shape(data_new)[0],left_right_start:left_right_start+np.shape(data_new)[1]] = data_new
@@ -146,8 +155,9 @@ def get_organised_data(loc, compute_size, edge_buffer, max_shadow_length, upsamp
 
 			if distance < 50:
 				
-				data_new, transform_new, dataset_new = open_tif_file(file_str_new)
-				
+				if app: data_new, transform_new = open_tif_file_app(file_str_new)
+				else: data_new, transform_new, dataset_new = open_tif_file(file_str_new)
+
 				up_down_start = padding_size+shape_data[0] # top left
 				left_right_start = padding_size # top left
 				data_pad[up_down_start:up_down_start+np.shape(data_new)[0],left_right_start:left_right_start+np.shape(data_new)[1]] = data_new
@@ -158,8 +168,9 @@ def get_organised_data(loc, compute_size, edge_buffer, max_shadow_length, upsamp
 
 				if distance < 50:
 				
-					data_new, transform_new, dataset_new = open_tif_file(file_str_new)
-					
+					if app: data_new, transform_new = open_tif_file_app(file_str_new)
+					else: data_new, transform_new, dataset_new = open_tif_file(file_str_new)
+
 					up_down_start = padding_size+shape_data[0] # top left
 					left_right_start = padding_size+np.shape(data_new)[1] # top left
 					data_pad[up_down_start:up_down_start+np.shape(data_new)[0],left_right_start:left_right_start+np.shape(data_new)[1]] = data_new
@@ -175,8 +186,9 @@ def get_organised_data(loc, compute_size, edge_buffer, max_shadow_length, upsamp
 
 			if distance < 50:
 				
-				data_new, transform_new, dataset_new = open_tif_file(file_str_new)
-				
+				if app: data_new, transform_new = open_tif_file_app(file_str_new)
+				else: data_new, transform_new, dataset_new = open_tif_file(file_str_new)
+
 				up_down_start = padding_size # top left
 				left_right_start = padding_size-np.shape(data_new)[1] # top left
 				data_pad[up_down_start:up_down_start+np.shape(data_new)[0],left_right_start:left_right_start+np.shape(data_new)[1]] = data_new
@@ -187,8 +199,9 @@ def get_organised_data(loc, compute_size, edge_buffer, max_shadow_length, upsamp
 
 				if distance < 50:
 				
-					data_new, transform_new, dataset_new = open_tif_file(file_str_new)
-					
+					if app: data_new, transform_new = open_tif_file_app(file_str_new)
+					else: data_new, transform_new, dataset_new = open_tif_file(file_str_new)
+
 					up_down_start = padding_size+shape_data[0] # top left
 					left_right_start = padding_size-np.shape(data_new)[1] # top left
 					data_pad[up_down_start:up_down_start+np.shape(data_new)[0],left_right_start:left_right_start+np.shape(data_new)[1]] = data_new
@@ -239,22 +252,67 @@ def index_tif_files(fileNames, json_filepath):
 		json.dump(bounds, json_file)
 
 
+def copy_npy(fileNames, save_filepath):
+
+	tif_files = glob.glob(fileNames)
+	
+	bounds = {}
+
+	for file in tif_files:
+		
+		tif_i_data, tif_i_transform, tif_i_dataset = open_tif_file(file)
+
+		file_root = file[4:-4]
+		np.save(f'{save_filepath}/{file_root}.npy',tif_i_data)
+		with open(f'{save_filepath}/{file_root}_transformer.pkl', 'wb') as f:
+		    pickle.dump(tif_i_transform, f)
+
+def open_tif_file_app(fileName, file_app):
+	# Data from https://environment.data.gov.uk/DefraDataDownload/?Mode=survey
+	fileName = fileName[4:-4]
+	filename_npy = join(dirname(file_app), fileName+".npy")
+	data = np.load(filename_npy,allow_pickle=True)
+	filename_transformer = join(dirname(file_app), fileName+"_transformer.pkl")
+	with open(filename_transformer, 'rb') as f:
+		transform = pickle.load(f)
+	return data, transform
 
 def open_tif_file(fileName):
+	import rasterio # hack - avoid importing in app
 	# Data from https://environment.data.gov.uk/DefraDataDownload/?Mode=survey
 	dataset = rasterio.open(fileName)
 	data = dataset.read(1)
 	transform = dataset.transform
 	return data, transform, dataset
 
-def get_centre_indexes(loc, transform, upsampling):
+def transform_rowcol(transformer, x_coords, y_coords):
+	# inv_transformer = transformer.inverse
+	inv_transformer = ~transformer
+	row_col_tuples = []
+	for x, y in zip([x_coords], [y_coords]):
+		row, col = inv_transformer * (x, y)
+		row, col = int(row), int(col)
+		row_col_tuples.append((row, col))
+	row_col_tuples = row_col_tuples[0]
+	return row_col_tuples[1], row_col_tuples[0]
 
-	transformer_toOS = Transformer.from_crs("EPSG:4326", "EPSG:27700")
-	idx_raw = transformer_toOS.transform(loc[0],loc[1])
-	idx = (idx_raw[1], -idx_raw[0])
-	y, x = rasterio.transform.rowcol(transform, -idx[1], idx[0])
-	y*=upsampling
-	x*=upsampling
+def get_centre_indexes(loc, transform, upsampling, app):
+	
+	if app:
+		transformer_toOS = Transformer.from_crs("EPSG:4326", "EPSG:27700")
+		idx_raw = transformer_toOS.transform(loc[0],loc[1])
+		idx = (idx_raw[1], -idx_raw[0])
+		y, x = transform_rowcol(transform, -idx[1], idx[0])
+		y*=upsampling
+		x*=upsampling
+	else:
+		import rasterio # hack - avoid importing in app
+		transformer_toOS = Transformer.from_crs("EPSG:4326", "EPSG:27700")
+		idx_raw = transformer_toOS.transform(loc[0],loc[1])
+		idx = (idx_raw[1], -idx_raw[0])
+		y, x = rasterio.transform.rowcol(transform, -idx[1], idx[0])
+		y*=upsampling
+		x*=upsampling
 
 	return x, y, idx_raw
 

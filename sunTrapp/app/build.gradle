@@ -30,6 +30,9 @@ android {
                 install "affine"
                 install "ephem"
                 install "imageio"
+                install "requests"
+                install "geopy"
+                install "scipy"
             }
         }
 

@@ -4,8 +4,9 @@ from pyproj import Transformer
 import numpy as np
 import geopy.distance
 from PIL import Image
+from os.path import dirname, join
 
-def get_satellite_image(latitude, longitude, zoom=20, size=(640, 640), api_key="YOUR_API_KEY"):
+def get_satellite_image(latitude, longitude, zoom=20, size=(640, 640), api_key="YOUR_API_KEY", app=None, file_app=None):
 	url = "https://maps.googleapis.com/maps/api/staticmap"
 	params = {
 		"center": f"{latitude},{longitude}",
@@ -16,8 +17,12 @@ def get_satellite_image(latitude, longitude, zoom=20, size=(640, 640), api_key="
 	}
 	response = requests.get(url, params=params)
 	if response.status_code == 200:
-		with open("satellite_image.jpg", "wb") as file:
-			file.write(response.content)
+		if app:
+			with open(join(dirname(file_app), "satellite_image.jpg"), "wb") as file:
+				file.write(response.content)
+		else:
+			with open("satellite_image.jpg", "wb") as file:
+				file.write(response.content)
 		# print("Satellite image saved successfully.")
 	else:
 		print("Error retrieving satellite image.")
@@ -33,7 +38,7 @@ def getPointLatLng(latitude, longitude, x, y, zoom, image_size):
 
 
 
-def get_cropped_satellite_image(loc, idx_raw, N_pixels, upsampling):
+def get_cropped_satellite_image(loc, idx_raw, N_pixels, upsampling, app=None, file_app=None):
 
 	N_pixels = np.asarray(N_pixels)*(1./upsampling)
 	
@@ -86,7 +91,7 @@ def get_cropped_satellite_image(loc, idx_raw, N_pixels, upsampling):
 
 
 
-	get_satellite_image(latitude, longitude, zoom=zoom, size=(image_size, image_size))
+	get_satellite_image(latitude, longitude, zoom=zoom, size=(image_size, image_size), app=app, file_app=file_app)
 
 	image_centre = (latitude, longitude)
 
@@ -98,7 +103,12 @@ def get_cropped_satellite_image(loc, idx_raw, N_pixels, upsampling):
 	required_top_edge = (required_bounds["north"], longitude)
 	scale_vertical = geopy.distance.geodesic(image_centre, required_top_edge).m/geopy.distance.geodesic(image_centre, image_top_edge).m
 
-	img=Image.open('satellite_image.jpg')
+
+	if app:
+		img=Image.open(join(dirname(file_app), "satellite_image.jpg"))
+	else:
+		img=Image.open('satellite_image.jpg')
+
 	frac_vertical = scale_vertical
 	frac_horizontal = frac_vertical*(N_pixels[0]/N_pixels[1])
 	left = img.size[0]*((1-frac_horizontal)/2)

@@ -11,7 +11,7 @@
     <RelativeLayout
         android:id="@+id/rel_map_view"
         android:layout_width="match_parent"
-        android:layout_height="350dp">
+        android:layout_height="250dp">
 
         <com.google.android.gms.maps.MapView
             android:id="@+id/map_view"
@@ -40,8 +40,8 @@
 
     <ImageView
         android:id="@+id/image_view_pyplot"
-        android:layout_width="match_parent"
         android:layout_height="350dp"
+        android:layout_width="410dp"
         android:src="@drawable/empty"
         app:layout_constraintTop_toBottomOf="@id/rel_map_view"
         app:layout_constraintBottom_toBottomOf="parent" />

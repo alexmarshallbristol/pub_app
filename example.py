@@ -20,32 +20,31 @@ sunTrapp.utilities.index_tif_files("tif/*.tif", "tif/bounds.json")
 
 tif_fileName = "tif/DSM_ST5570_P_10631_20190117_20190117.tif"
 # loc = [51.453291, -2.609596] # hope and anchor
-# loc = [51.47214797493697, -2.5777949681918355]
-# loc = [51.476459748752944, -2.539813990044241]#star
-loc = [51.47626161552586, -2.53695255376283]
+loc = [51.46136560299646, -2.5539305734162956]
+
 
 max_shadow_length = 75
 compute_size = [50, 50] # area 2N (x, y)
 edge_buffer = 5
 output = f"temp/plot"
-output_gif = "university"
+output_gif = "NiaandBens"
 upsampling = 2
 date = '2023/06/22'
 
-##
-time_string = "16:50:00"
-debug = True
-show = True
-###
+# ##
+# time_string = "16:50:00"
+# debug = True
+# show = True
+# ###
 
-# ###
-# show = False
-# debug = False
-# start_time = "15:00:00"
-# end_time = "23:00:00"
-# time_steps = 10
-# time_string = sunTrapp.utilities.generate_time_stamps(start_time, end_time, time_steps)
-# ###
+###
+show = False
+debug = False
+start_time = "06:00:00"
+end_time = "23:00:00"
+time_steps = 30
+time_string = sunTrapp.utilities.generate_time_stamps(start_time, end_time, time_steps)
+###
 
 avoid_satellite = False
 
