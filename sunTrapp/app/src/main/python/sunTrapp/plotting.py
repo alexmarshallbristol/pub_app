@@ -10,13 +10,14 @@ shade_color = '#121110'  # Darker blue color for shade
 colors = [shade_color,sun_color]
 cmap = LinearSegmentedColormap.from_list('sun_shade_cmap', colors)
 
-
 def publish_plot(shadows, filename, overlay=None, time_string=None, date=None, show=False):
+	
+	width = 8
+	height = width * (np.shape(shadows)[0]/np.shape(shadows)[1])
 
-	plt.figure(figsize=(6,6))
+	plt.figure(figsize=(width,height))
 	ax = plt.gca()
 	if overlay is not None:
-		print('satellite:', np.shape(overlay), 'shadows', np.shape(shadows))
 		shadows = scipy.ndimage.zoom(shadows, np.shape(overlay)[0]/np.shape(shadows)[0], order=0)
 		plt.imshow(overlay)
 	plt.imshow(shadows, cmap=cmap, alpha=0.35, vmin=0, vmax=1)
@@ -28,7 +29,7 @@ def publish_plot(shadows, filename, overlay=None, time_string=None, date=None, s
 		plt.text(0.01, 0.90, f'Date: {date}', fontsize=20, horizontalalignment='left',verticalalignment='top', transform=ax.transAxes, c='w')
 	plt.subplots_adjust(hspace=0,wspace=0)
 	plt.tight_layout()        
-	plt.savefig(filename)
+	plt.savefig(filename, transparent=True)
 	if show:
 		plt.show()
 	plt.close('all')

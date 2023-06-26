@@ -78,11 +78,15 @@ class shadow_computer:
 
 		image_height, image_width = np.shape(padded_image)[1] - 2*pad_height, np.shape(padded_image)[0] - 2*pad_height
 
+		# print(image_height, image_width)
+		# quit()
 		result = np.zeros((image_width, image_height))
 		distance_matrix = distance_matrix[mask]
-		for i in range(pad_height, image_height + pad_height):
-			for j in range(pad_width, image_width + pad_width):
+		for j in range(pad_height, image_height + pad_height):
+			for i in range(pad_width, image_width + pad_width):
 				region_heights = padded_image[i - pad_height : i + pad_height + 1, j - pad_width : j + pad_width + 1]
+				# print(np.shape(region_heights))
+				# quit()
 				region_heights = region_heights[mask]
 				convolution = np.degrees(np.nanmax(np.arctan2((region_heights - padded_image[i, j]), distance_matrix)))
 				result[i - pad_height, j - pad_width] = convolution
@@ -97,7 +101,7 @@ class shadow_computer:
 		is_sunny = np.ones(np.shape(is_sunny_angels))
 		is_sunny[np.where(is_sunny_angels>self.altitude)] = 0.
 
-		region_of_interest = region_of_interest[int(y_idx-compute_size-edge_buffer):int(y_idx+compute_size-edge_buffer+1*upsampling),int(x_idx-compute_size-edge_buffer):int(x_idx+compute_size-edge_buffer+1*upsampling)]
+		region_of_interest = region_of_interest[int(y_idx-compute_size[1]-edge_buffer):int(y_idx+compute_size[1]-edge_buffer+1*upsampling),int(x_idx-compute_size[0]-edge_buffer):int(x_idx+compute_size[0]-edge_buffer+1*upsampling)]
 	
 		return is_sunny, region_of_interest
 

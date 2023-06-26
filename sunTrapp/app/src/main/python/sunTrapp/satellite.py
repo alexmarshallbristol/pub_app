@@ -35,13 +35,13 @@ def getPointLatLng(latitude, longitude, x, y, zoom, image_size):
 
 def get_cropped_satellite_image(loc, idx_raw, N_pixels, upsampling):
 
-	N_pixels *= (1./upsampling)
+	N_pixels = np.asarray(N_pixels)*(1./upsampling)
 	
 	transformer_toGPS = Transformer.from_crs("EPSG:27700", "EPSG:4326")
-	idx_GPS = transformer_toGPS.transform(idx_raw[0]+N_pixels,idx_raw[1]+N_pixels)
+	idx_GPS = transformer_toGPS.transform(idx_raw[0]+N_pixels[0],idx_raw[1]+N_pixels[1])
 	idx_GPS_top = (idx_GPS[0], idx_GPS[1])
 
-	idx_GPS = transformer_toGPS.transform(idx_raw[0]-N_pixels,idx_raw[1]-N_pixels)
+	idx_GPS = transformer_toGPS.transform(idx_raw[0]-N_pixels[0],idx_raw[1]-N_pixels[1])
 	idx_GPS_bottom = (idx_GPS[0], idx_GPS[1])
 
 	# Example usage
@@ -89,21 +89,18 @@ def get_cropped_satellite_image(loc, idx_raw, N_pixels, upsampling):
 	get_satellite_image(latitude, longitude, zoom=zoom, size=(image_size, image_size))
 
 	image_centre = (latitude, longitude)
-	image_right_edge = (latitude, image_bounds["east"])
-	required_right_edge = (latitude, required_bounds["east"])
 
-	scale_horizontal = geopy.distance.geodesic(image_centre, required_right_edge).m/geopy.distance.geodesic(image_centre, image_right_edge).m
+	# image_right_edge = (latitude, image_bounds["east"])
+	# required_right_edge = (latitude, required_bounds["east"])
+	# scale_horizontal = geopy.distance.geodesic(image_centre, required_right_edge).m/geopy.distance.geodesic(image_centre, image_right_edge).m
 
 	image_top_edge = (image_bounds["north"], longitude)
 	required_top_edge = (required_bounds["north"], longitude)
-
 	scale_vertical = geopy.distance.geodesic(image_centre, required_top_edge).m/geopy.distance.geodesic(image_centre, image_top_edge).m
 
 	img=Image.open('satellite_image.jpg')
-	frac_horizontal = scale_horizontal
 	frac_vertical = scale_vertical
-	frac_horizontal = np.mean([frac_horizontal, frac_vertical])
-	frac_vertical = frac_horizontal
+	frac_horizontal = frac_vertical*(N_pixels[0]/N_pixels[1])
 	left = img.size[0]*((1-frac_horizontal)/2)
 	upper = img.size[1]*((1-frac_vertical)/2)
 	right = img.size[0]-((1-frac_horizontal)/2)*img.size[0]
