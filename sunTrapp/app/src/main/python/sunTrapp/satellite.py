@@ -18,7 +18,7 @@ def get_satellite_image(latitude, longitude, zoom=20, size=(640, 640), api_key="
 	if response.status_code == 200:
 		with open("satellite_image.jpg", "wb") as file:
 			file.write(response.content)
-		print("Satellite image saved successfully.")
+		# print("Satellite image saved successfully.")
 	else:
 		print("Error retrieving satellite image.")
 

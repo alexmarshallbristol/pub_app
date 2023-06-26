@@ -37,19 +37,22 @@ def publish_plot(shadows, filename, overlay=None, time_string=None, date=None, s
 
 def debug_plot(shadows, filename, region_of_interest, satellite, time_string=None, date=None, show=False):
 
-	plt.figure(figsize=(12*0.8,8*0.8))
+	width = 4
+	height = width * (np.shape(shadows)[0]/np.shape(shadows)[1])
+
+	plt.figure(figsize=(width*3,height*2))
 
 	plt.subplot(2,3,1)
 	plt.imshow(region_of_interest, vmin=0.1, vmax=100, norm=LogNorm())
-	plt.colorbar()
+	# plt.colorbar()
 
 	plt.subplot(2,3,2)
 	plt.imshow(satellite)
-	plt.colorbar()
+	# plt.colorbar()
 
 	plt.subplot(2,3,3)
 	plt.imshow(shadows, cmap=cmap, vmin=0, vmax=1)
-	plt.colorbar()
+	# plt.colorbar()
 
 	plt.subplot(2,3,4)
 	ax = plt.gca()
@@ -68,7 +71,7 @@ def debug_plot(shadows, filename, region_of_interest, satellite, time_string=Non
 
 	plt.subplots_adjust(hspace=0,wspace=0)
 	plt.tight_layout()        
-	plt.savefig(filename)
+	plt.savefig(filename, transparent=True)
 	if show:
 		plt.show()
 	plt.close('all')
