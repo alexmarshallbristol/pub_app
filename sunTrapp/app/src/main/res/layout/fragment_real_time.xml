@@ -26,15 +26,15 @@
             android:layout_marginStart="297dp"
             android:text="Centre" />
 
-        <Button
-            android:id="@+id/reset_button"
-            android:layout_width="95dp"
-            android:layout_height="45dp"
-            android:layout_marginTop="60dp"
-            android:layout_marginStart="297dp"
-            android:text="Reset"
-            app:layout_constraintEnd_toEndOf="@+id/map_view"
-            app:layout_constraintTop_toTopOf="@+id/map_view" />
+<!--        <Button-->
+<!--            android:id="@+id/reset_button"-->
+<!--            android:layout_width="95dp"-->
+<!--            android:layout_height="45dp"-->
+<!--            android:layout_marginTop="60dp"-->
+<!--            android:layout_marginStart="297dp"-->
+<!--            android:text="Reset"-->
+<!--            app:layout_constraintEnd_toEndOf="@+id/map_view"-->
+<!--            app:layout_constraintTop_toTopOf="@+id/map_view" />-->
 
     </RelativeLayout>
 

@@ -236,16 +236,21 @@ class RealTimeFragment : Fragment() {
         googleMap.setOnMapClickListener { latLng ->
             // Create a marker at the clicked location
             val markerOptions = MarkerOptions().position(latLng).title("Clicked Location")
+            googleMap.clear()
             googleMap.addMarker(markerOptions)
             val loc = LocationDetails(latLng.longitude.toString(), latLng.latitude.toString(), "0.", Date(System.currentTimeMillis()))
             pause_updates = false
+
+            val pos = LatLng(latLng.latitude.toDouble(), latLng.longitude.toDouble())
+            val update = CameraUpdateFactory.newLatLngZoom(pos, 16f)
+            map.animateCamera(update)
 
             updateCards(latLng.longitude.toString(), latLng.latitude.toString())
         }
 
 
         val pos = LatLng(51.4545, -2.5879)
-        val update = CameraUpdateFactory.newLatLngZoom(pos, 12.5f)
+        val update = CameraUpdateFactory.newLatLngZoom(pos, 12f)
         map.moveCamera(update)
 
         //insert the marker in the current position
@@ -393,7 +398,10 @@ override fun onDestroy() {
         button.setOnClickListener {
 //            map.animateCamera(CameraUpdateFactory.newLatLngZoom(current_position, 15f))
             try{
-                map.animateCamera(current_CameraUpdate)
+//                map.animateCamera(current_CameraUpdate)
+                val pos = LatLng(51.4545, -2.5879)
+                val update = CameraUpdateFactory.newLatLngZoom(pos, 12f)
+                map.moveCamera(update)
             }
             catch(e: Exception){}
 
@@ -406,11 +414,22 @@ override fun onDestroy() {
 
         buttonSearch.setOnClickListener {
             val searchText = textSearch.text.toString()
-            val pos = updateCards("-2.589319401608773", "51.45468949647952" , searchText)
 
-//            map.animateCamera(CameraUpdateFactory.newLatLngZoom(current_position, 15f))
-//            val pos = LatLng(sample.latitude.toDouble(), sample.longitude.toDouble())
-//            val update = CameraUpdateFactory.newLatLngZoom(pos, 15f)
+
+            val py = Python.getInstance()
+            val module = py.getModule("plot")
+            val result = module.callAttr("query_google_maps_search", searchText)
+            val resultList = result.asList()
+            updateCards(resultList[1].toString(), resultList[0].toString() , searchText)
+
+            val pos = LatLng(resultList[0].toDouble(), resultList[1].toDouble())
+            val update = CameraUpdateFactory.newLatLngZoom(pos, 16f)
+            map.animateCamera(update)
+
+            val markerOptions = MarkerOptions().position(pos).title("Searched Location")
+            map.clear()
+            map.addMarker(markerOptions)
+
 
             // hide the keyboard
 //            val inputMethodManager = requireContext().getSystemService(requireContext().INPUT_METHOD_SERVICE) as InputMethodManager

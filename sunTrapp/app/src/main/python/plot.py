@@ -40,30 +40,31 @@ cmap = LinearSegmentedColormap.from_list('sun_shade_cmap', colors)
 
 # data from https://environment.data.gov.uk/DefraDataDownload/?Mode=survey
 
+def query_google_maps_search(display_string):
+	
+	api_key = "AIzaSyBbngN_VCGUbLyOBYpn1FepIDJYCsmr-GA"
+	address = display_string+", bristol"
+	url = f"https://maps.googleapis.com/maps/api/geocode/json?address={address}&key={api_key}"
+	response = requests.get(url)
+	data = response.json()
+	if data["status"] == "OK":
+		location = data["results"][0]["geometry"]["location"]
+		latitude = location["lng"]
+		longitude = location["lat"]
+		loc = [float(longitude), float(latitude)]
+		print(f"Latitude: {latitude}, Longitude: {longitude}")
+	else:
+		print("Geocoding failed. Status:", data["status"])
+	
+	display_string = f'{longitude:.6f} {latitude:.6f}'
+	return [longitude, latitude]
+
 def plot_func(latitude_in, longitude_in, display_string=""):
 
 	loc = [float(longitude_in), float(latitude_in)]
 
-	if display_string != "":
-		api_key = "AIzaSyBbngN_VCGUbLyOBYpn1FepIDJYCsmr-GA"
-		address = display_string+", bristol"
-		url = f"https://maps.googleapis.com/maps/api/geocode/json?address={address}&key={api_key}"
-		response = requests.get(url)
-		data = response.json()
-		if data["status"] == "OK":
-			location = data["results"][0]["geometry"]["location"]
-			latitude = location["lng"]
-			longitude = location["lat"]
-			loc = [float(longitude), float(latitude)]
-			print(f"Latitude: {latitude}, Longitude: {longitude}")
-		else:
-			print("Geocoding failed. Status:", data["status"])
-		
-		display_string = f'{longitude:.6f} {latitude:.6f}'
-
-
-	max_shadow_length = 25
-	compute_size = [25, 25] # area 2N (x, y)
+	max_shadow_length = 50
+	compute_size = [30, 30] # area 2N (x, y)
 	compute_size[0] = int(compute_size[0]*(410/350))
 	edge_buffer = 5
 	output = f"plot"
@@ -72,8 +73,8 @@ def plot_func(latitude_in, longitude_in, display_string=""):
 
 	###
 	start_time = "16:00:00"
-	end_time = "18:00:00"
-	time_steps = 2
+	end_time = "21:00:00"
+	time_steps = 7
 	time_string = sunTrapp.utilities.generate_time_stamps(start_time, end_time, time_steps)
 	###
 
@@ -129,7 +130,7 @@ def plot_func(latitude_in, longitude_in, display_string=""):
 		if date is not None:
 			plt.text(0.01, 0.90, f'Date: {date}', fontsize=20, horizontalalignment='left',verticalalignment='top', transform=ax.transAxes, c='w')
 		if display_string is not None:
-			plt.text(0.5, 0.5, f'{display_string}', fontsize=25, horizontalalignment='center',verticalalignment='center', transform=ax.transAxes, c='w')
+			plt.text(0.01, 0.83, f'Search: {display_string}', fontsize=20, horizontalalignment='left',verticalalignment='top', transform=ax.transAxes, c='w')
 		plt.subplots_adjust(hspace=0,wspace=0)
 		plt.tight_layout()        
 		plt.savefig(join(dirname(__file__), f"{output}_{time_itr}.png"), transparent=True)
