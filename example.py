@@ -9,26 +9,12 @@ import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.colors import LogNorm
 
-import requests
-display_string = "bs5 9ES, bristol"
-# display_string = "hope and anchor, bristol"
-api_key = "AIzaSyBbngN_VCGUbLyOBYpn1FepIDJYCsmr-GA"
-address = display_string
-url = f"https://maps.googleapis.com/maps/api/geocode/json?address={address}&key={api_key}"
-response = requests.get(url)
-data = response.json()
-
-# if data["status"] == "OK":
-location = data["results"][0]["geometry"]["location"]
-latitude = location["lat"]
-longitude = location["lng"]
-print(latitude, longitude)
-quit()
 
 # data from https://environment.data.gov.uk/DefraDataDownload/?Mode=survey
 
 # # # one off:
-sunTrapp.utilities.index_tif_files("tif/*.tif", "tif/bounds.json")
+# sunTrapp.utilities.index_tif_files("tif/*.tif", "tif/bounds.json")
+
 ## OPTIONS
 
 # tif_fileName = "tif/homefarm.tif"
@@ -47,20 +33,20 @@ output_gif = "NiaandBens"
 upsampling = 2
 date = '2023/06/22'
 
-# ##
-# time_string = "16:50:00"
-# debug = True
-# show = True
-# ###
+##
+time_string = "16:50:00"
+debug = True
+show = True
+###
 
-###
-show = False
-debug = False
-start_time = "06:00:00"
-end_time = "23:00:00"
-time_steps = 30
-time_string = sunTrapp.utilities.generate_time_stamps(start_time, end_time, time_steps)
-###
+# ###
+# show = False
+# debug = False
+# start_time = "06:00:00"
+# end_time = "23:00:00"
+# time_steps = 30
+# time_string = sunTrapp.utilities.generate_time_stamps(start_time, end_time, time_steps)
+# ###
 
 avoid_satellite = False
 
