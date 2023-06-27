@@ -33,6 +33,7 @@ android {
                 install "requests"
                 install "geopy"
                 install "scipy"
+                install "datetime"
             }
         }
 

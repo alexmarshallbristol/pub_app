@@ -31,6 +31,7 @@ from matplotlib.colors import LogNorm
 from PIL import Image
 import scipy.ndimage
 import requests
+import datetime
 
 sun_color = '#FFD700'  # Brighter yellow color for sun
 shade_color = '#121110'  # Darker blue color for shade
@@ -59,7 +60,7 @@ def query_google_maps_search(display_string):
 	display_string = f'{longitude:.6f} {latitude:.6f}'
 	return [longitude, latitude]
 
-def plot_func(latitude_in, longitude_in, display_string=""):
+def plot_func(counter, latitude_in, longitude_in, display_string="", hourText="", minuteText="", dayText="", monthText=""):
 
 	loc = [float(longitude_in), float(latitude_in)]
 
@@ -69,7 +70,6 @@ def plot_func(latitude_in, longitude_in, display_string=""):
 	edge_buffer = 5
 	output = f"plot"
 	upsampling = 2
-	date = '2023/06/22'
 
 	# ###
 	# start_time = "16:00:00"
@@ -79,8 +79,22 @@ def plot_func(latitude_in, longitude_in, display_string=""):
 	# ###
 
 	###
-	time_string = "16:00:00"
+	# time_string = "16:00:00"
 	###
+
+	current_time = datetime.datetime.now()
+	current_date = datetime.date.today()
+	if not ("0" <= hourText <= "60"):
+		hourText = str(current_time.hour)
+	if not ("0" <= minuteText <= "60"):
+		minuteText = str(current_time.minute)
+	if not ("1" <= dayText <= "31"):
+		dayText = str(current_date.day)
+	if not ("1" <= monthText <= "12"):
+		monthText = str(current_date.month)
+
+	time_string = f"{hourText}:{minuteText}:00"
+	date = f'2023/{monthText}/{dayText}'
 
 
 	#############################################
@@ -137,9 +151,13 @@ def plot_func(latitude_in, longitude_in, display_string=""):
 			plt.text(0.01, 0.90, f'Date: {date}', fontsize=20, horizontalalignment='left',verticalalignment='top', transform=ax.transAxes, c='w')
 		if display_string is not None:
 			plt.text(0.01, 0.83, f'Search: {display_string}', fontsize=20, horizontalalignment='left',verticalalignment='top', transform=ax.transAxes, c='w')
+		
+		# hourText="", minuteText="", dayText="", monthText=""
+
+		# plt.text(0.5, 0.5, f'{hourText} {minuteText} {dayText} {monthText}', fontsize=20, horizontalalignment='center',verticalalignment='center', transform=ax.transAxes, c='w')
 		plt.subplots_adjust(hspace=0,wspace=0)
 		plt.tight_layout()        
-		plt.savefig(join(dirname(__file__), f"{output}_{time_itr}.png"), transparent=True, pad_inches=0)
+		plt.savefig(join(dirname(__file__), f"{counter}_{output}_{time_itr}.png"), transparent=True, pad_inches=0)
 		plt.close('all')
 		
 		# sunTrapp.plotting.publish_plot(shadows, filename, cropped_satellite_image, time_string=time_string_i, date=date, show=False)
@@ -154,10 +172,10 @@ def plot_func(latitude_in, longitude_in, display_string=""):
 		# plt.savefig(join(dirname(__file__), f"{output}_{time_itr}.png"))
 		# plt.close()
 
-		image_files.append(Image.open(join(dirname(__file__), f"{output}_{time_itr}.png")))
+		image_files.append(Image.open(join(dirname(__file__), f"{counter}_{output}_{time_itr}.png")))
 	
 	context = Python.getPlatform().getApplication()
-	file_path = os.path.join(context.getFilesDir().getAbsolutePath(), f"gif_file_{latitude_in}_{longitude_in}.gif")
+	file_path = os.path.join(context.getFilesDir().getAbsolutePath(), f"gif_file_{latitude_in}_{longitude_in}_{counter}.gif")
 		
 	image_files[0].save(
 		file_path,

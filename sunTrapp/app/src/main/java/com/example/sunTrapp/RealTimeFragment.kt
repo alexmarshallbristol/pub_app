@@ -74,7 +74,14 @@ class RealTimeFragment : Fragment() {
     private lateinit var textSearch : EditText
     private  lateinit var buttonSearch : Button
 
-//    private lateinit var pyplotImage : WebView
+
+    private lateinit var textHour : EditText
+    private lateinit var textMinute : EditText
+    private lateinit var textDay : EditText
+    private lateinit var textMonth : EditText
+
+
+    //    private lateinit var pyplotImage : WebView
     private lateinit var pyplotImage : ImageView
 //    private lateinit var pyplotImage : pl.droidsonroids.gif.GifImageView
 
@@ -88,6 +95,7 @@ class RealTimeFragment : Fragment() {
     private lateinit var tvTreeCard1_image : MutableList<ImageView>
     private lateinit var tvTreeCard1_compass : MutableList<ImageView>
 
+    var latest_position = LatLng(51.4545, -2.5879)
 //    private lateinit var tvTreeCard1_cardView : MutableList<CardView>
     private lateinit var tvTreeCard1_viewButton : MutableList<Button>
 
@@ -410,19 +418,41 @@ override fun onDestroy() {
         pyplotImage = view.findViewById(R.id.image_view_pyplot)
 
         textSearch = view.findViewById<EditText>(R.id.editTextSearch)
+
+        textHour = view.findViewById<EditText>(R.id.editTextHour)
+        textMinute = view.findViewById<EditText>(R.id.editTextMinute)
+        textDay = view.findViewById<EditText>(R.id.editTextDay)
+        textMonth = view.findViewById<EditText>(R.id.editTextMonth)
+
+
         val buttonSearch = view.findViewById<Button>(R.id.buttonSearch)
 
         buttonSearch.setOnClickListener {
             val searchText = textSearch.text.toString()
 
 
+            var hourText = textHour.text.toString()
+            var minuteText = textMinute.text.toString()
+            var dayText = textDay.text.toString()
+            var monthText = textMonth.text.toString()
+
             val py = Python.getInstance()
             val module = py.getModule("plot")
+
             val result = module.callAttr("query_google_maps_search", searchText)
             val resultList = result.asList()
-            updateCards(resultList[1].toString(), resultList[0].toString() , searchText)
 
-            val pos = LatLng(resultList[0].toDouble(), resultList[1].toDouble())
+
+            var pos: LatLng
+            if(searchText.isEmpty()){
+                updateCards(latest_position.latitude.toString(), latest_position.longitude.toString(), searchText, hourText, minuteText, dayText, monthText)
+                pos = LatLng(latest_position.longitude, latest_position.latitude)
+            }
+            else{
+                updateCards(resultList[1].toString(), resultList[0].toString(), searchText, hourText, minuteText, dayText, monthText)
+                pos = LatLng(resultList[0].toDouble(), resultList[1].toDouble())
+            }
+
             val update = CameraUpdateFactory.newLatLngZoom(pos, 16f)
             map.animateCamera(update)
 
@@ -600,8 +630,10 @@ override fun onDestroy() {
      * @param location location details to update the cards with. If any of the 3 components is null, that means that it was impossible to retrieve
      * the location. Therefore, we show that No data is available.
      */
-    private fun updateCards(latitude_in: String, longitude_in: String, display_string: String="")
+    private fun updateCards(latitude_in: String, longitude_in: String, display_string: String="", hourText: String="", minuteText: String="", dayText: String="", monthText: String="")
     {
+        counter = counter + 1
+        latest_position = LatLng(latitude_in.toDouble(), longitude_in.toDouble())
 
         // UPDATES GO HERE
 
@@ -617,14 +649,14 @@ override fun onDestroy() {
             override fun doInBackground(vararg params: Void?): ByteArray {
                 val py = Python.getInstance()
                 val module = py.getModule("plot")
-                return module.callAttr("plot_func", latitude_in, longitude_in, display_string).toJava(ByteArray::class.java)
+                return module.callAttr("plot_func", counter, latitude_in, longitude_in, display_string, hourText, minuteText, dayText, monthText).toJava(ByteArray::class.java)
             }
 
             override fun onPostExecute(result: ByteArray?) {
                 super.onPostExecute(result)
                 // Update the ImageView with the result image on the UI thread
                 if (result != null) {
-                    val filePath = File(requireContext().filesDir, "gif_file_"+latitude_in+"_"+longitude_in+".gif").absolutePath
+                    val filePath = File(requireContext().filesDir, "gif_file_"+latitude_in+"_"+longitude_in+"_"+counter.toString()+".gif").absolutePath
                     Glide.with(requireContext())
                         .asGif()
                         .load(filePath)
