@@ -64,19 +64,24 @@ def plot_func(latitude_in, longitude_in, display_string=""):
 	loc = [float(longitude_in), float(latitude_in)]
 
 	max_shadow_length = 25
-	compute_size = [25, 25] # area 2N (x, y)
+	compute_size = [35, 35] # area 2N (x, y)
 	compute_size[0] = int(compute_size[0]*(410/350))
 	edge_buffer = 5
 	output = f"plot"
-	upsampling = 1
+	upsampling = 2
 	date = '2023/06/22'
 
+	# ###
+	# start_time = "16:00:00"
+	# end_time = "23:00:00"
+	# time_steps = 10
+	# time_string = sunTrapp.utilities.generate_time_stamps(start_time, end_time, time_steps)
+	# ###
+
 	###
-	start_time = "16:00:00"
-	end_time = "18:00:00"
-	time_steps = 2
-	time_string = sunTrapp.utilities.generate_time_stamps(start_time, end_time, time_steps)
+	time_string = "16:00:00"
 	###
+
 
 	#############################################
 	print(f"shadow size: {(compute_size[0]*2+1)*upsampling}, {(compute_size[1]*2+1)*upsampling}")
@@ -118,7 +123,8 @@ def plot_func(latitude_in, longitude_in, display_string=""):
 		height = width * (np.shape(shadows)[0]/np.shape(shadows)[1])
 
 		plt.figure(figsize=(width,height))
-		ax = plt.gca()
+		ax = plt.axes((0, 0, 1, 1))
+		# ax = plt.gca()
 		if overlay is not None:
 			shadows = scipy.ndimage.zoom(shadows, np.shape(overlay)[0]/np.shape(shadows)[0], order=0)
 			plt.imshow(overlay)
@@ -133,7 +139,7 @@ def plot_func(latitude_in, longitude_in, display_string=""):
 			plt.text(0.01, 0.83, f'Search: {display_string}', fontsize=20, horizontalalignment='left',verticalalignment='top', transform=ax.transAxes, c='w')
 		plt.subplots_adjust(hspace=0,wspace=0)
 		plt.tight_layout()        
-		plt.savefig(join(dirname(__file__), f"{output}_{time_itr}.png"), transparent=True)
+		plt.savefig(join(dirname(__file__), f"{output}_{time_itr}.png"), transparent=True, pad_inches=0)
 		plt.close('all')
 		
 		# sunTrapp.plotting.publish_plot(shadows, filename, cropped_satellite_image, time_string=time_string_i, date=date, show=False)

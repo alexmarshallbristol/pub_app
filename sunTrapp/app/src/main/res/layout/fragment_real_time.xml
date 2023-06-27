@@ -26,17 +26,8 @@
             android:layout_marginStart="297dp"
             android:text="Centre" />
 
-<!--        <Button-->
-<!--            android:id="@+id/reset_button"-->
-<!--            android:layout_width="95dp"-->
-<!--            android:layout_height="45dp"-->
-<!--            android:layout_marginTop="60dp"-->
-<!--            android:layout_marginStart="297dp"-->
-<!--            android:text="Reset"-->
-<!--            app:layout_constraintEnd_toEndOf="@+id/map_view"-->
-<!--            app:layout_constraintTop_toTopOf="@+id/map_view" />-->
-
     </RelativeLayout>
+
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -44,7 +35,7 @@
         android:orientation="horizontal"
         android:gravity="end"
         app:layout_constraintTop_toBottomOf="@id/rel_map_view"
-        app:layout_constraintBottom_toTopOf="@id/image_view_pyplot">
+        app:layout_constraintBottom_toTopOf="@id/linear_layout_time">
 
         <EditText
             android:id="@+id/editTextSearch"
@@ -58,17 +49,72 @@
             android:id="@+id/buttonSearch"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Search" />
+            android:text="Submit" />
 
     </LinearLayout>
+
+
+
+
+    <LinearLayout
+        android:id="@+id/linear_layout_time"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="end"
+        app:layout_constraintBottom_toTopOf="@id/image_view_pyplot">
+
+        <EditText
+            android:id="@+id/editTextHour"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:hint="hour"
+            android:inputType="number"
+            android:textColorHint="#B0B0B0"/>
+
+        <EditText
+            android:id="@+id/editTextMinute"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:hint="min"
+            android:inputType="number"
+            android:textColorHint="#B0B0B0" />
+
+        <View
+            android:layout_width="1dp"
+            android:layout_height="match_parent"
+            android:background="#B0B0B0"/>
+
+        <EditText
+            android:id="@+id/editTextDay"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:hint="day"
+            android:inputType="number"
+            android:textColorHint="#B0B0B0"/>
+
+        <EditText
+            android:id="@+id/editTextMonth"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:hint="month"
+            android:inputType="number"
+            android:textColorHint="#B0B0B0"/>
+
+    </LinearLayout>
+
 
     <ImageView
         android:id="@+id/image_view_pyplot"
         android:layout_height="350dp"
-        android:layout_width="410dp"
+        android:layout_width="match_parent"
         android:src="@drawable/empty"
-        app:layout_constraintTop_toBottomOf="@id/rel_map_view"
-        app:layout_constraintBottom_toBottomOf="parent" />
-
+        app:layout_constraintTop_toBottomOf="@id/linear_layout_time"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

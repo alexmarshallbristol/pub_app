@@ -33,20 +33,21 @@ output_gif = "NiaandBens"
 upsampling = 2
 date = '2023/06/22'
 
-##
-time_string = "16:50:00"
-debug = True
-show = True
-###
+# ##
+# time_string = "16:50:00"
+# debug = True
+# show = True
+# ###
 
-# ###
-# show = False
-# debug = False
-# start_time = "06:00:00"
-# end_time = "23:00:00"
-# time_steps = 30
-# time_string = sunTrapp.utilities.generate_time_stamps(start_time, end_time, time_steps)
-# ###
+
+###
+show = False
+debug = False
+start_time = "06:00:00"
+end_time = "23:00:00"
+time_steps = 30
+time_string = sunTrapp.utilities.generate_time_stamps(start_time, end_time, time_steps)
+###
 
 avoid_satellite = False
 
@@ -74,6 +75,9 @@ if time_string.__class__ != list: time_string = [time_string]
 for time_itr, time_string_i in enumerate(time_string):
 
 	print(time_itr, time_string_i)
+
+	# shadow_calculator = sunTrapp.shadow_computer.shadow_computer_fast(data, max_shadow_length, upsampling, edge_buffer)
+	# shadows, region_of_interest = shadow_calculator.compute(data, x_idx, y_idx, compute_size, edge_buffer, upsampling)
 
 	shadow_calculator = sunTrapp.shadow_computer.shadow_computer(date, time_string_i, loc[0], loc[1], max_shadow_length, upsampling)
 	shadows, region_of_interest = shadow_calculator.compute(data, x_idx, y_idx, compute_size, edge_buffer, upsampling)

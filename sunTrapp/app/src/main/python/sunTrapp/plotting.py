@@ -16,20 +16,22 @@ def publish_plot(shadows, filename, overlay=None, time_string=None, date=None, s
 	height = width * (np.shape(shadows)[0]/np.shape(shadows)[1])
 
 	plt.figure(figsize=(width,height))
-	ax = plt.gca()
+	ax = plt.axes((0, 0, 1, 1))
+	# ax = plt.gca()
 	if overlay is not None:
 		shadows = scipy.ndimage.zoom(shadows, np.shape(overlay)[0]/np.shape(shadows)[0], order=0)
 		plt.imshow(overlay)
 	plt.imshow(shadows, cmap=cmap, alpha=0.35, vmin=0, vmax=1)
-	plt.yticks([],[])   
-	plt.xticks([],[]) 
+	# plt.yticks([],[])   
+	# plt.xticks([],[]) 
+	plt.axis('off')
 	if time_string is not None:
 		plt.text(0.01, 0.97, f'Time: {time_string}', fontsize=20, horizontalalignment='left',verticalalignment='top', transform=ax.transAxes, c='w')
 	if date is not None:
 		plt.text(0.01, 0.90, f'Date: {date}', fontsize=20, horizontalalignment='left',verticalalignment='top', transform=ax.transAxes, c='w')
 	plt.subplots_adjust(hspace=0,wspace=0)
 	plt.tight_layout()        
-	plt.savefig(filename, transparent=True)
+	plt.savefig(filename, transparent=True, pad_inches=0)
 	if show:
 		plt.show()
 	plt.close('all')
