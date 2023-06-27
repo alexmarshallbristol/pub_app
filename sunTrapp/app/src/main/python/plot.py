@@ -63,8 +63,8 @@ def plot_func(latitude_in, longitude_in, display_string=""):
 
 	loc = [float(longitude_in), float(latitude_in)]
 
-	max_shadow_length = 50
-	compute_size = [30, 30] # area 2N (x, y)
+	max_shadow_length = 25
+	compute_size = [25, 25] # area 2N (x, y)
 	compute_size[0] = int(compute_size[0]*(410/350))
 	edge_buffer = 5
 	output = f"plot"
@@ -73,8 +73,8 @@ def plot_func(latitude_in, longitude_in, display_string=""):
 
 	###
 	start_time = "16:00:00"
-	end_time = "21:00:00"
-	time_steps = 7
+	end_time = "18:00:00"
+	time_steps = 2
 	time_string = sunTrapp.utilities.generate_time_stamps(start_time, end_time, time_steps)
 	###
 
