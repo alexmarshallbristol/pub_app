@@ -30,6 +30,7 @@ import matplotlib.pyplot as plt
 from matplotlib.colors import LogNorm
 from PIL import Image
 import scipy.ndimage
+import requests
 
 sun_color = '#FFD700'  # Brighter yellow color for sun
 shade_color = '#121110'  # Darker blue color for shade
@@ -39,12 +40,30 @@ cmap = LinearSegmentedColormap.from_list('sun_shade_cmap', colors)
 
 # data from https://environment.data.gov.uk/DefraDataDownload/?Mode=survey
 
-def plot_func(latitude_in, longitude_in):
+def plot_func(latitude_in, longitude_in, display_string=""):
 
 	loc = [float(longitude_in), float(latitude_in)]
 
-	max_shadow_length = 75
-	compute_size = [30, 30] # area 2N (x, y)
+	if display_string != "":
+		api_key = "AIzaSyBbngN_VCGUbLyOBYpn1FepIDJYCsmr-GA"
+		address = display_string+", bristol"
+		url = f"https://maps.googleapis.com/maps/api/geocode/json?address={address}&key={api_key}"
+		response = requests.get(url)
+		data = response.json()
+		if data["status"] == "OK":
+			location = data["results"][0]["geometry"]["location"]
+			latitude = location["lng"]
+			longitude = location["lat"]
+			loc = [float(longitude), float(latitude)]
+			print(f"Latitude: {latitude}, Longitude: {longitude}")
+		else:
+			print("Geocoding failed. Status:", data["status"])
+		
+		display_string = f'{longitude:.6f} {latitude:.6f}'
+
+
+	max_shadow_length = 25
+	compute_size = [25, 25] # area 2N (x, y)
 	compute_size[0] = int(compute_size[0]*(410/350))
 	edge_buffer = 5
 	output = f"plot"
@@ -54,7 +73,7 @@ def plot_func(latitude_in, longitude_in):
 	###
 	start_time = "16:00:00"
 	end_time = "18:00:00"
-	time_steps = 3
+	time_steps = 2
 	time_string = sunTrapp.utilities.generate_time_stamps(start_time, end_time, time_steps)
 	###
 
@@ -109,6 +128,8 @@ def plot_func(latitude_in, longitude_in):
 			plt.text(0.01, 0.97, f'Time: {time_string}', fontsize=20, horizontalalignment='left',verticalalignment='top', transform=ax.transAxes, c='w')
 		if date is not None:
 			plt.text(0.01, 0.90, f'Date: {date}', fontsize=20, horizontalalignment='left',verticalalignment='top', transform=ax.transAxes, c='w')
+		if display_string is not None:
+			plt.text(0.5, 0.5, f'{display_string}', fontsize=25, horizontalalignment='center',verticalalignment='center', transform=ax.transAxes, c='w')
 		plt.subplots_adjust(hspace=0,wspace=0)
 		plt.tight_layout()        
 		plt.savefig(join(dirname(__file__), f"{output}_{time_itr}.png"), transparent=True)

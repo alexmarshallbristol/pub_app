@@ -45,6 +45,9 @@ import com.chaquo.python.android.AndroidPlatform
 
 import com.bumptech.glide.Glide
 import android.os.AsyncTask
+import android.widget.EditText
+import android.view.inputmethod.InputMethodManager
+import androidx.core.content.ContextCompat.getSystemService
 
 class RealTimeFragment : Fragment() {
     /**
@@ -68,6 +71,8 @@ class RealTimeFragment : Fragment() {
     private lateinit var tvDis : TextView
     private lateinit var tvDis2 : TextView
     private lateinit var tvDis3 : TextView
+    private lateinit var textSearch : EditText
+    private  lateinit var buttonSearch : Button
 
 //    private lateinit var pyplotImage : WebView
     private lateinit var pyplotImage : ImageView
@@ -372,6 +377,10 @@ override fun onDestroy() {
         //Inflating layout from the resources
         val view = inflater.inflate(R.layout.fragment_real_time, container,false)
 
+        fun View.hideKeyboard() {
+            val inputManager = requireContext().getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+            inputManager.hideSoftInputFromWindow(windowToken, 0)
+        }
 
 
         mapView = view.findViewById(R.id.map_view)
@@ -391,6 +400,26 @@ override fun onDestroy() {
         }
 
         pyplotImage = view.findViewById(R.id.image_view_pyplot)
+
+        textSearch = view.findViewById<EditText>(R.id.editTextSearch)
+        val buttonSearch = view.findViewById<Button>(R.id.buttonSearch)
+
+        buttonSearch.setOnClickListener {
+            val searchText = textSearch.text.toString()
+            val pos = updateCards("-2.589319401608773", "51.45468949647952" , searchText)
+
+//            map.animateCamera(CameraUpdateFactory.newLatLngZoom(current_position, 15f))
+//            val pos = LatLng(sample.latitude.toDouble(), sample.longitude.toDouble())
+//            val update = CameraUpdateFactory.newLatLngZoom(pos, 15f)
+
+            // hide the keyboard
+//            val inputMethodManager = requireContext().getSystemService(requireContext().INPUT_METHOD_SERVICE) as InputMethodManager
+//            inputMethodManager.hideSoftInputFromWindow(textSearch.windowToken, 0)
+            it.hideKeyboard()
+        }
+
+
+
 
 //        val html = """
 //            <html>
@@ -416,6 +445,7 @@ override fun onDestroy() {
 //        val filePath = File(requireContext().filesDir, "gif_file.gif").absolutePath
 //        Glide.with(requireContext()).asGif().load(filePath).into(pyplotImage)
 //
+
 
 
 
@@ -551,7 +581,7 @@ override fun onDestroy() {
      * @param location location details to update the cards with. If any of the 3 components is null, that means that it was impossible to retrieve
      * the location. Therefore, we show that No data is available.
      */
-    private fun updateCards(latitude_in: String, longitude_in: String)
+    private fun updateCards(latitude_in: String, longitude_in: String, display_string: String="")
     {
 
         // UPDATES GO HERE
@@ -568,7 +598,7 @@ override fun onDestroy() {
             override fun doInBackground(vararg params: Void?): ByteArray {
                 val py = Python.getInstance()
                 val module = py.getModule("plot")
-                return module.callAttr("plot_func", latitude_in, longitude_in).toJava(ByteArray::class.java)
+                return module.callAttr("plot_func", latitude_in, longitude_in, display_string).toJava(ByteArray::class.java)
             }
 
             override fun onPostExecute(result: ByteArray?) {

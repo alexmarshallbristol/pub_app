@@ -92,7 +92,7 @@ def get_organised_data(loc, compute_size, edge_buffer, max_shadow_length, upsamp
 
 			if distance < 50:
 				
-				if app: data_new, transform_new = open_tif_file_app(file_str_new)
+				if app: data_new, transform_new = open_tif_file_app(file_str_new, file_app)
 				else: data_new, transform_new, dataset_new = open_tif_file(file_str_new)
 
 				up_down_start = padding_size-np.shape(data_new)[0] # top left
@@ -105,7 +105,7 @@ def get_organised_data(loc, compute_size, edge_buffer, max_shadow_length, upsamp
 
 				if distance < 50:
 				
-					if app: data_new, transform_new = open_tif_file_app(file_str_new)
+					if app: data_new, transform_new = open_tif_file_app(file_str_new, file_app)
 					else: data_new, transform_new, dataset_new = open_tif_file(file_str_new)
 
 					up_down_start = padding_size-np.shape(data_new)[0] # top left
@@ -124,7 +124,7 @@ def get_organised_data(loc, compute_size, edge_buffer, max_shadow_length, upsamp
 
 			if distance < 50:
 				
-				if app: data_new, transform_new = open_tif_file_app(file_str_new)
+				if app: data_new, transform_new = open_tif_file_app(file_str_new, file_app)
 				else: data_new, transform_new, dataset_new = open_tif_file(file_str_new)
 
 				up_down_start = padding_size # top left
@@ -137,7 +137,7 @@ def get_organised_data(loc, compute_size, edge_buffer, max_shadow_length, upsamp
 
 				if distance < 50:
 					
-					if app: data_new, transform_new = open_tif_file_app(file_str_new)
+					if app: data_new, transform_new = open_tif_file_app(file_str_new, file_app)
 					else: data_new, transform_new, dataset_new = open_tif_file(file_str_new)
 
 					up_down_start = padding_size-np.shape(data_new)[0] # top left
@@ -155,7 +155,7 @@ def get_organised_data(loc, compute_size, edge_buffer, max_shadow_length, upsamp
 
 			if distance < 50:
 				
-				if app: data_new, transform_new = open_tif_file_app(file_str_new)
+				if app: data_new, transform_new = open_tif_file_app(file_str_new, file_app)
 				else: data_new, transform_new, dataset_new = open_tif_file(file_str_new)
 
 				up_down_start = padding_size+shape_data[0] # top left
@@ -168,7 +168,7 @@ def get_organised_data(loc, compute_size, edge_buffer, max_shadow_length, upsamp
 
 				if distance < 50:
 				
-					if app: data_new, transform_new = open_tif_file_app(file_str_new)
+					if app: data_new, transform_new = open_tif_file_app(file_str_new, file_app)
 					else: data_new, transform_new, dataset_new = open_tif_file(file_str_new)
 
 					up_down_start = padding_size+shape_data[0] # top left
@@ -186,7 +186,7 @@ def get_organised_data(loc, compute_size, edge_buffer, max_shadow_length, upsamp
 
 			if distance < 50:
 				
-				if app: data_new, transform_new = open_tif_file_app(file_str_new)
+				if app: data_new, transform_new = open_tif_file_app(file_str_new, file_app)
 				else: data_new, transform_new, dataset_new = open_tif_file(file_str_new)
 
 				up_down_start = padding_size # top left
@@ -199,7 +199,7 @@ def get_organised_data(loc, compute_size, edge_buffer, max_shadow_length, upsamp
 
 				if distance < 50:
 				
-					if app: data_new, transform_new = open_tif_file_app(file_str_new)
+					if app: data_new, transform_new = open_tif_file_app(file_str_new, file_app)
 					else: data_new, transform_new, dataset_new = open_tif_file(file_str_new)
 
 					up_down_start = padding_size+shape_data[0] # top left

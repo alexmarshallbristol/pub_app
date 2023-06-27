@@ -9,6 +9,22 @@ import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.colors import LogNorm
 
+import requests
+display_string = "bs5 9ES, bristol"
+# display_string = "hope and anchor, bristol"
+api_key = "AIzaSyBbngN_VCGUbLyOBYpn1FepIDJYCsmr-GA"
+address = display_string
+url = f"https://maps.googleapis.com/maps/api/geocode/json?address={address}&key={api_key}"
+response = requests.get(url)
+data = response.json()
+
+# if data["status"] == "OK":
+location = data["results"][0]["geometry"]["location"]
+latitude = location["lat"]
+longitude = location["lng"]
+print(latitude, longitude)
+quit()
+
 # data from https://environment.data.gov.uk/DefraDataDownload/?Mode=survey
 
 # # # one off:
