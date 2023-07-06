@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Web Server</title>
+    <style>
+        #output-image {
+            cursor: pointer;
+            position: relative;
+        }
+
+        .marker {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            background-color: red;
+            border-radius: 50%;
+        }
+    </style>
+</head>
+<body>
+    <h1>Web Server</h1>
+    <form action="/process" method="post">
+        <input type="text" name="location">
+        <input type="submit" value="Submit">
+    </form>
+    {% if file_path %}
+        <h2>Output</h2>
+        <div style="position: relative;">
+            <a href="#" onclick="handleImageClick(event)">
+                <img src="{{ url_for('serve_image', filename=file_path) }}" alt="Output Image">
+            </a>
+            <div id="marker-container"></div>
+        </div>
+        <button onclick="clearMarkers()">Clear Markers</button>
+    {% endif %}
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        function handleImageClick(event) {
+            event.preventDefault();
+
+            var x = event.offsetX;
+            var y = event.offsetY;
+
+            // Send the coordinates to the server using AJAX
+            $.ajax({
+                type: 'POST',
+                url: '/record_coordinates',
+                data: JSON.stringify({'x': x, 'y': y}),
+                contentType: 'application/json',
+                success: function(response) {
+                    console.log(response);
+
+                    // Add a marker element to the container
+                    var marker = document.createElement('div');
+                    marker.classList.add('marker');
+                    marker.style.left = x + 'px';
+                    marker.style.top = y + 'px';
+
+                    var markerContainer = document.getElementById('marker-container');
+                    markerContainer.appendChild(marker);
+                }
+            });
+        }
+
+        function clearMarkers() {
+            // Clear all marker elements
+            var markerContainer = document.getElementById('marker-container');
+            while (markerContainer.firstChild) {
+                markerContainer.removeChild(markerContainer.firstChild);
+            }
+
+            // Clear the coordinates file
+            $.ajax({
+                type: 'POST',
+                url: '/clear_coordinates',
+                success: function(response) {
+                    console.log(response);
+                }
+            });
+        }
+    </script>
+</body>
+</html>
+
+
+
+<!-- <!DOCTYPE html>
+<html>
+<head>
+    <title>Web Server</title>
+    <style>
+        #output-image {
+            cursor: pointer;
+            position: relative;
+        }
+
+        .marker {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            background-color: red;
+            border-radius: 50%;
+        }
+    </style>
+</head>
+<body>
+    <h1>Web Server</h1>
+    {% if file_path %}
+        <h2>Output</h2>
+        <div style="position: relative;">
+            <a href="#" onclick="handleImageClick(event)">
+                <img src="{{ url_for('serve_image', filename=file_path) }}" alt="Output Image">
+            </a>
+            <div id="marker-container"></div>
+        </div>
+        <button onclick="clearMarkers()">Clear Markers</button>
+    {% endif %}
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        function handleImageClick(event) {
+            event.preventDefault();
+
+            var x = event.offsetX;
+            var y = event.offsetY;
+
+            // Send the coordinates to the server using AJAX
+            $.ajax({
+                type: 'POST',
+                url: '/record_coordinates',
+                data: JSON.stringify({'x': x, 'y': y}),
+                contentType: 'application/json',
+                success: function(response) {
+                    console.log(response);
+
+                    // Add a marker element to the container
+                    var marker = document.createElement('div');
+                    marker.classList.add('marker');
+                    marker.style.left = x + 'px';
+                    marker.style.top = y + 'px';
+
+                    var markerContainer = document.getElementById('marker-container');
+                    markerContainer.appendChild(marker);
+                }
+            });
+        }
+
+        function clearMarkers() {
+            // Clear all marker elements
+            var markerContainer = document.getElementById('marker-container');
+            while (markerContainer.firstChild) {
+                markerContainer.removeChild(markerContainer.firstChild);
+            }
+
+            // Clear the coordinates file
+            $.ajax({
+                type: 'POST',
+                url: '/clear_coordinates',
+                success: function(response) {
+                    console.log(response);
+                }
+            });
+        }
+    </script>
+</body>
+</html> -->
+
+
+
+<!-- 
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Web Server</title>
+    <style>
+        #output-image {
+            cursor: pointer;
+            position: relative;
+        }
+
+        .marker {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            background-color: red;
+            border-radius: 50%;
+        }
+    </style>
+</head>
+<body>
+    <h1>Web Server</h1>
+    <form action="/process" method="post">
+        <input type="text" name="input_text">
+        <input type="submit" value="Submit">
+    </form>
+    {% if file_path %}
+        <h2>Output</h2>
+        <div style="position: relative;">
+            <a href="#" onclick="handleImageClick(event)">
+                <img src="{{ url_for('serve_image', filename=file_path) }}" alt="Output Image">
+            </a>
+            <div id="marker-container"></div>
+        </div>
+        <button onclick="clearMarkers()">Clear Markers</button>
+    {% endif %}
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        function handleImageClick(event) {
+            event.preventDefault();
+
+            var x = event.offsetX;
+            var y = event.offsetY;
+
+            // Send the coordinates to the server using AJAX
+            $.ajax({
+                type: 'POST',
+                url: '/record_coordinates',
+                data: JSON.stringify({'x': x, 'y': y}),
+                contentType: 'application/json',
+                success: function(response) {
+                    console.log(response);
+
+                    // Add a marker element to the container
+                    var marker = document.createElement('div');
+                    marker.classList.add('marker');
+                    marker.style.left = x + 'px';
+                    marker.style.top = y + 'px';
+
+                    var markerContainer = document.getElementById('marker-container');
+                    markerContainer.appendChild(marker);
+                }
+            });
+        }
+
+        function clearMarkers() {
+            // Clear all marker elements
+            var markerContainer = document.getElementById('marker-container');
+            while (markerContainer.firstChild) {
+                markerContainer.removeChild(markerContainer.firstChild);
+            }
+
+            // Clear the coordinates file
+            $.ajax({
+                type: 'POST',
+                url: '/clear_coordinates',
+                success: function(response) {
+                    console.log(response);
+                }
+            });
+        }
+    </script>
+</body>
+</html> -->
+
