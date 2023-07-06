@@ -10,6 +10,43 @@ import sunTrapp.image_tools
 from math import radians, sin, cos, sqrt, atan2
 import pickle
 from os.path import dirname, join
+from pyproj import Transformer
+
+def no_floor(values):
+	return values
+
+def convert_boundaries_GPS_to_relative_pixels(loc, boundaries, upsampling, transform, centre_indexes):
+
+	transformer_toOS = Transformer.from_crs("EPSG:4326", "EPSG:27700")
+	boundaries_pixels = np.empty((0,2))
+	for boundary_point in boundaries:
+		idx = transformer_toOS.transform(boundary_point[0],boundary_point[1])
+		idx = (idx[1], -idx[0])
+		y_point_gps_boundary, x_point_gps_boundary = transform_rowcol(transform, -idx[1], idx[0])#, op=no_floor)
+		y_point_gps_boundary*=upsampling
+		x_point_gps_boundary*=upsampling
+		y_point_gps_boundary+= -centre_indexes[0]*upsampling
+		x_point_gps_boundary+= -centre_indexes[1]*upsampling
+		boundaries_pixels = np.append(boundaries_pixels, [[y_point_gps_boundary, x_point_gps_boundary]], axis=0)
+
+	return boundaries_pixels
+
+
+
+
+def remove_outer_regions(array, buffer=2):
+		# Find the indices of the non-zero elements along each axis
+		non_zero_rows = np.nonzero(np.any(array != -1, axis=1))[0]
+		non_zero_cols = np.nonzero(np.any(array != -1, axis=0))[0]
+
+		# Slice the array to remove the featureless outer regions
+		result = array[non_zero_rows[0]-buffer:non_zero_rows[-1]+1+buffer, non_zero_cols[0]-buffer:non_zero_cols[-1]+1+buffer]
+		
+		return result
+
+
+
+
 
 def check_coordinate_within_bounds(coordinate, bounds):
 	top_left = bounds['top_left']
@@ -48,7 +85,7 @@ def get_organised_data(loc, compute_size, edge_buffer, max_shadow_length, upsamp
 	if app: data, transform = open_tif_file_app(file, file_app)
 	else: data, transform, dataset = open_tif_file(file)
 	x_idx, y_idx, idx_raw = get_centre_indexes(loc, transform, 1., app)
-
+	centre_indexes = (y_idx, x_idx)
 
 
 	top = y_idx - (int(image_height/2.)+2)
@@ -211,7 +248,7 @@ def get_organised_data(loc, compute_size, edge_buffer, max_shadow_length, upsamp
 	data[np.where(data<-1E3)] = -99
 	data = sunTrapp.image_tools.replace_zeros(data, value=-99)
 	
-	return data, idx_raw 
+	return data, idx_raw, transform, centre_indexes
 
 
 def index_tif_files(fileNames, json_filepath):
@@ -285,13 +322,14 @@ def open_tif_file(fileName):
 	transform = dataset.transform
 	return data, transform, dataset
 
-def transform_rowcol(transformer, x_coords, y_coords):
+def transform_rowcol(transformer, x_coords, y_coords, no_floor=True):
 	# inv_transformer = transformer.inverse
 	inv_transformer = ~transformer
 	row_col_tuples = []
 	for x, y in zip([x_coords], [y_coords]):
 		row, col = inv_transformer * (x, y)
-		row, col = int(row), int(col)
+		if no_floor == False:
+			row, col = int(row), int(col)
 		row_col_tuples.append((row, col))
 	row_col_tuples = row_col_tuples[0]
 	return row_col_tuples[1], row_col_tuples[0]

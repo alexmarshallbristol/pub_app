@@ -19,8 +19,6 @@ shade_color = '#121110'  # Darker blue color for shade
 colors = [shade_color,sun_color]
 cmap = LinearSegmentedColormap.from_list('sun_shade_cmap', colors)
 
-
-
 __file__ = '/Users/am13743/Desktop/pub_gardens/sunTrapp/app/src/main/python/BUFFER'
 
 def query_google_maps_search(display_string):
@@ -42,28 +40,6 @@ def query_google_maps_search(display_string):
 
 	display_string = f'{latitude:.6f} {longitude:.6f}'
 	return loc
-
-
-# def run_process(input_text, API=False):
-
-# 	latlong = query_google_maps_search(input_text)
-
-# 	plt.title(f'lat: {latlong[0]}, long: {latlong[1]}')
-# 	plt.hist2d(np.random.normal(0,1,100), np.random.normal(0,1,100), bins=25)
-# 	root_dir = os.getcwd()
-
-# 	timestamp = int(time.time())  # Generate a unique timestamp
-	
-# 	files = glob.glob(os.path.join(root_dir, f'images/*.png'))
-# 	for file in files:
-# 		os.remove(file)
-		
-# 	plt.savefig(os.path.join(root_dir, f'images/output_{timestamp}.png'))
-# 	plt.close('all')
-	
-# 	file_path = f'images/output_{timestamp}.png'
-
-# 	return file_path
 
 
 def run_process(input_location_string, API=False):
@@ -147,30 +123,9 @@ def run_process(input_location_string, API=False):
 	if input_location_string is not None:
 		plt.text(0.01, 0.83, f'Search: {input_location_string}', fontsize=20, horizontalalignment='left',verticalalignment='top', transform=ax.transAxes, c='w')
 	
-	# hourText="", minuteText="", dayText="", monthText=""
-
-	# plt.text(0.5, 0.5, f'{hourText} {minuteText} {dayText} {monthText}', fontsize=20, horizontalalignment='center',verticalalignment='center', transform=ax.transAxes, c='w')
 	plt.subplots_adjust(hspace=0,wspace=0)
 	plt.tight_layout()        
 	plt.savefig(file_path, transparent=True, pad_inches=0)
 	plt.close('all')
-
-
-
-	
-	# plt.title(f'lat: {latlong[0]}, long: {latlong[1]}')
-	# plt.hist2d(np.random.normal(0,1,100), np.random.normal(0,1,100), bins=25)
-	# root_dir = os.getcwd()
-
-	# timestamp = int(time.time())  # Generate a unique timestamp
-	
-	# files = glob.glob(os.path.join(root_dir, f'images/*.png'))
-	# for file in files:
-	# 	os.remove(file)
-		
-	# plt.savefig(os.path.join(root_dir, f'images/output_{timestamp}.png'))
-	# plt.close('all')
-	
-	# file_path = f'images/output_{timestamp}.png'
 
 	return file_path
