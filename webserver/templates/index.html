@@ -1,11 +1,34 @@
+
 <!DOCTYPE html>
 <html>
 <head>
     <title>Web Server</title>
     <style>
         #output-image {
-            cursor: pointer;
+            /* cursor: pointer; */
             position: relative;
+            float: left;
+        }
+        #navi,
+        #polygon {
+            height: 100%;
+            top: 0;
+            left: 0;
+            position: absolute;
+            pointer-events: none;
+            z-index: 10; /* Increase the z-index to overlay the polygon on top of the image */
+        }
+
+        #output-image button {
+            position: absolute;
+            bottom: 10px; /* adjust the position as needed */
+            right: 10px; /* adjust the position as needed */
+            z-index: 10; /* ensure the button is above other elements */
+        }
+
+        #garden-image {
+            float: left;
+            margin-left: 10px; /* adjust the margin as needed */
         }
 
         .marker {
@@ -15,6 +38,7 @@
             background-color: red;
             border-radius: 50%;
         }
+
     </style>
 </head>
 <body>
@@ -25,18 +49,27 @@
     </form>
     {% if file_path %}
         <h2>Output</h2>
-        <div style="position: relative;">
+        <div id="output-image">
             <a href="#" onclick="handleImageClick(event)">
                 <img src="{{ url_for('serve_image', filename=file_path) }}" alt="Output Image">
             </a>
             <div id="marker-container"></div>
+            <canvas id="polygon"></canvas>
+            <button onclick="clearMarkers()">Clear Markers</button>
         </div>
-        <button onclick="clearMarkers()">Clear Markers</button>
+        <div id="garden-image">
+            <img src="{{ url_for('serve_garden_image', filename=file_path) }}" alt="Garden Image">
+        </div>
+        <!-- <button onclick="clearMarkers()">Clear Markers</button> -->
     {% endif %}
 
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script>
+        var markers = [];
+        var polygon;
+
         function handleImageClick(event) {
+
             event.preventDefault();
 
             var x = event.offsetX;
@@ -59,6 +92,14 @@
 
                     var markerContainer = document.getElementById('marker-container');
                     markerContainer.appendChild(marker);
+
+                    // Add marker coordinates to the markers array
+                    markers.push({ x: x, y: y });
+
+                    // Check if there are more than 2 markers
+                    if (markers.length > 2) {
+                        drawPolygon();
+                    }
                 }
             });
         }
@@ -78,180 +119,60 @@
                     console.log(response);
                 }
             });
+            
+            markers = [];
+
+            // Clear the polygon
+            clearPolygon();
+        }
+
+        function drawPolygon() {
+            // Remove existing polygon if any
+            clearPolygon();
+
+            var canvas = document.getElementById('polygon');
+            var ctx = canvas.getContext('2d');
+
+            // Set canvas dimensions to match the image
+            var img = document.querySelector('img');
+            canvas.width = img.clientWidth;
+            canvas.height = img.clientHeight;
+
+            // Draw the polygon
+            ctx.beginPath();
+            ctx.moveTo(markers[0].x, markers[0].y);
+            for (var i = 1; i < markers.length; i++) {
+                ctx.lineTo(markers[i].x, markers[i].y);
+            }
+            ctx.closePath();
+            ctx.strokeStyle = 'blue';
+            ctx.lineWidth = 2;
+            ctx.stroke();          
+
+            // Redraw the markers
+            for (var i = 0; i < markers.length; i++) {
+                var marker = document.createElement('div');
+                marker.classList.add('marker');
+                marker.style.left = markers[i].x + 'px';
+                marker.style.top = markers[i].y + 'px';
+
+                var markerContainer = document.getElementById('marker-container');
+                markerContainer.appendChild(marker);
+            }
+
+            // Save the polygon reference
+            polygon = canvas;
+
+            
+        }
+
+        function clearPolygon() {
+            if (polygon) {
+                polygon.getContext('2d').clearRect(0, 0, polygon.width, polygon.height);
+                polygon = null;
+            }
         }
     </script>
 </body>
 </html>
-
-
-
-<!-- <!DOCTYPE html>
-<html>
-<head>
-    <title>Web Server</title>
-    <style>
-        #output-image {
-            cursor: pointer;
-            position: relative;
-        }
-
-        .marker {
-            position: absolute;
-            width: 10px;
-            height: 10px;
-            background-color: red;
-            border-radius: 50%;
-        }
-    </style>
-</head>
-<body>
-    <h1>Web Server</h1>
-    {% if file_path %}
-        <h2>Output</h2>
-        <div style="position: relative;">
-            <a href="#" onclick="handleImageClick(event)">
-                <img src="{{ url_for('serve_image', filename=file_path) }}" alt="Output Image">
-            </a>
-            <div id="marker-container"></div>
-        </div>
-        <button onclick="clearMarkers()">Clear Markers</button>
-    {% endif %}
-
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script>
-        function handleImageClick(event) {
-            event.preventDefault();
-
-            var x = event.offsetX;
-            var y = event.offsetY;
-
-            // Send the coordinates to the server using AJAX
-            $.ajax({
-                type: 'POST',
-                url: '/record_coordinates',
-                data: JSON.stringify({'x': x, 'y': y}),
-                contentType: 'application/json',
-                success: function(response) {
-                    console.log(response);
-
-                    // Add a marker element to the container
-                    var marker = document.createElement('div');
-                    marker.classList.add('marker');
-                    marker.style.left = x + 'px';
-                    marker.style.top = y + 'px';
-
-                    var markerContainer = document.getElementById('marker-container');
-                    markerContainer.appendChild(marker);
-                }
-            });
-        }
-
-        function clearMarkers() {
-            // Clear all marker elements
-            var markerContainer = document.getElementById('marker-container');
-            while (markerContainer.firstChild) {
-                markerContainer.removeChild(markerContainer.firstChild);
-            }
-
-            // Clear the coordinates file
-            $.ajax({
-                type: 'POST',
-                url: '/clear_coordinates',
-                success: function(response) {
-                    console.log(response);
-                }
-            });
-        }
-    </script>
-</body>
-</html> -->
-
-
-
-<!-- 
-
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Web Server</title>
-    <style>
-        #output-image {
-            cursor: pointer;
-            position: relative;
-        }
-
-        .marker {
-            position: absolute;
-            width: 10px;
-            height: 10px;
-            background-color: red;
-            border-radius: 50%;
-        }
-    </style>
-</head>
-<body>
-    <h1>Web Server</h1>
-    <form action="/process" method="post">
-        <input type="text" name="input_text">
-        <input type="submit" value="Submit">
-    </form>
-    {% if file_path %}
-        <h2>Output</h2>
-        <div style="position: relative;">
-            <a href="#" onclick="handleImageClick(event)">
-                <img src="{{ url_for('serve_image', filename=file_path) }}" alt="Output Image">
-            </a>
-            <div id="marker-container"></div>
-        </div>
-        <button onclick="clearMarkers()">Clear Markers</button>
-    {% endif %}
-
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script>
-        function handleImageClick(event) {
-            event.preventDefault();
-
-            var x = event.offsetX;
-            var y = event.offsetY;
-
-            // Send the coordinates to the server using AJAX
-            $.ajax({
-                type: 'POST',
-                url: '/record_coordinates',
-                data: JSON.stringify({'x': x, 'y': y}),
-                contentType: 'application/json',
-                success: function(response) {
-                    console.log(response);
-
-                    // Add a marker element to the container
-                    var marker = document.createElement('div');
-                    marker.classList.add('marker');
-                    marker.style.left = x + 'px';
-                    marker.style.top = y + 'px';
-
-                    var markerContainer = document.getElementById('marker-container');
-                    markerContainer.appendChild(marker);
-                }
-            });
-        }
-
-        function clearMarkers() {
-            // Clear all marker elements
-            var markerContainer = document.getElementById('marker-container');
-            while (markerContainer.firstChild) {
-                markerContainer.removeChild(markerContainer.firstChild);
-            }
-
-            // Clear the coordinates file
-            $.ajax({
-                type: 'POST',
-                url: '/clear_coordinates',
-                success: function(response) {
-                    console.log(response);
-                }
-            });
-        }
-    </script>
-</body>
-</html> -->
 

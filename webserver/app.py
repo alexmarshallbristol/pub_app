@@ -3,6 +3,7 @@ from PIL import Image
 from flask import jsonify
 import io
 import processes
+import numpy as np
 
 app = Flask(__name__)
 
@@ -20,6 +21,8 @@ def record_coordinates():
 		f.write(f'{x},{y}\n')
 
 	print(f'Recorded coordinates: {x}, {y}')
+
+	processes.plot_polygon(coordinates_file)
 
 	return jsonify({'message': 'Coordinates recorded successfully'})
 
@@ -57,12 +60,17 @@ def api_process():
 @app.route('/process', methods=['POST'])
 def process():
 	input_location_string = request.form['location']
+	clear_coordinates()
 	file_path = processes.run_process(input_location_string)
 	return render_template('index.html', file_path=file_path)
 
 @app.route('/images/<path:filename>')
 def serve_image(filename):
 	return send_file(f'{filename}')
+
+@app.route('/graphics/<path:filename>')
+def serve_garden_image(filename):
+	return send_file('graphics/no_response.png')
 
 
 

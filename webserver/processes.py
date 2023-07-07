@@ -26,7 +26,10 @@ def query_google_maps_search(display_string):
 	api_key = "AIzaSyBbngN_VCGUbLyOBYpn1FepIDJYCsmr-GA"
 	address = display_string+", bristol"
 	url = f"https://maps.googleapis.com/maps/api/geocode/json?address={address}&key={api_key}"
-	response = requests.get(url)
+	try:
+		response = requests.get(url)
+	except:
+		return [0., 0.]
 	data = response.json()
 	if data["status"] == "OK":
 		location = data["results"][0]["geometry"]["location"]
@@ -53,10 +56,13 @@ def run_process(input_location_string, API=False):
 
 	latlong = query_google_maps_search(input_location_string)
 
+	if latlong == [0., 0.]: return f'graphics/no_response.png'
+
 	loc = [float(latlong[0]), float(latlong[1])]
 
-	max_shadow_length = 25
-	compute_size = [35, 35] # area 2N (x, y)
+	max_shadow_length = 15
+	# compute_size = [35, 35] # area 2N (x, y)
+	compute_size = [15, 15] # area 2N (x, y)
 	compute_size[0] = int(compute_size[0]*(410/350))
 	edge_buffer = 5
 	output = f"plot"
@@ -129,3 +135,11 @@ def run_process(input_location_string, API=False):
 	plt.close('all')
 
 	return file_path
+
+
+def plot_polygon(coordinates_file):
+
+	coordinates_array = np.loadtxt(coordinates_file, delimiter=',')
+
+	if np.shape(coordinates_array)[0] > 2:
+		print("POLYGON")
