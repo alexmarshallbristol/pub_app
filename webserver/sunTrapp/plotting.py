@@ -82,18 +82,15 @@ def debug_plot(shadows, filename, region_of_interest, satellite, time_string=Non
 
 def analyse_garden(shadows, boundaries_pixels_in):
 
-	boundaries_pixels = boundaries_pixels_in.copy()
-	boundaries_pixels[:,0] = boundaries_pixels[:,0]+(np.shape(shadows)[0]/2)
-	boundaries_pixels[:,1] = boundaries_pixels[:,1]+(np.shape(shadows)[1]/2)
-	boundaries_pixels_swap = boundaries_pixels.copy()
-	boundaries_pixels_swap[:,1] = boundaries_pixels[:,0]
-	boundaries_pixels_swap[:,0] = boundaries_pixels[:,1]
+	boundaries_pixels_swap = boundaries_pixels_in
+
+	print(boundaries_pixels_swap)
 
 	poly = plt.Polygon(boundaries_pixels_swap, ec="w", fill=False)
 	path = poly.get_path()
 
-	rows = np.arange(np.shape(shadows)[0]).reshape(np.shape(shadows)[0], 1)
-	cols = np.arange(np.shape(shadows)[1]).reshape(1, np.shape(shadows)[1])
+	cols = np.arange(np.shape(shadows)[0]).reshape(np.shape(shadows)[0], 1)
+	rows = np.arange(np.shape(shadows)[1]).reshape(1, np.shape(shadows)[1])
 	meshgrid_rows, meshgrid_cols = np.meshgrid(rows, cols)
 	result_array = np.stack((meshgrid_cols,meshgrid_rows), axis=2)
 	result_array = result_array.reshape((np.shape(result_array)[0]*np.shape(result_array)[1],2))
@@ -103,19 +100,18 @@ def analyse_garden(shadows, boundaries_pixels_in):
 
 	where_contained = path.contains_points(result_array_swap)
 
+
 	is_sunny_pad_garden = np.expand_dims(shadows, -1)
 	save_shape = np.shape(is_sunny_pad_garden)
 	is_sunny_pad_garden = is_sunny_pad_garden.reshape((np.shape(result_array)[0],1))
 	
+
 	is_sunny_pad_garden_only = is_sunny_pad_garden[where_contained]
 
 	is_sunny_pad_garden[~where_contained] = -1
 	is_sunny_pad_garden = is_sunny_pad_garden.reshape(save_shape)
 
 	is_sunny_pad_garden_cut = sunTrapp.utilities.remove_outer_regions(is_sunny_pad_garden)
-
-	# plt.imshow(is_sunny_pad_garden_cut)
-	# plt.show()
 
 	fraction_sunny = np.sum(is_sunny_pad_garden_only)/np.shape(is_sunny_pad_garden_only)[0]
 

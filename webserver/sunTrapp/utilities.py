@@ -17,16 +17,23 @@ def no_floor(values):
 
 def convert_boundaries_GPS_to_relative_pixels(loc, boundaries, upsampling, transform, centre_indexes):
 
+	print('centre_indexes', centre_indexes)
 	transformer_toOS = Transformer.from_crs("EPSG:4326", "EPSG:27700")
 	boundaries_pixels = np.empty((0,2))
 	for boundary_point in boundaries:
+		print('\n')
+		print(boundary_point)
 		idx = transformer_toOS.transform(boundary_point[0],boundary_point[1])
+		print(idx)
 		idx = (idx[1], -idx[0])
 		y_point_gps_boundary, x_point_gps_boundary = transform_rowcol(transform, -idx[1], idx[0])#, op=no_floor)
+		print(y_point_gps_boundary, x_point_gps_boundary)
 		y_point_gps_boundary*=upsampling
 		x_point_gps_boundary*=upsampling
+		print(y_point_gps_boundary, x_point_gps_boundary)
 		y_point_gps_boundary+= -centre_indexes[0]*upsampling
 		x_point_gps_boundary+= -centre_indexes[1]*upsampling
+		print(y_point_gps_boundary, x_point_gps_boundary)
 		boundaries_pixels = np.append(boundaries_pixels, [[y_point_gps_boundary, x_point_gps_boundary]], axis=0)
 
 	return boundaries_pixels

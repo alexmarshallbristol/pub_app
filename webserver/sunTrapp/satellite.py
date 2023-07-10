@@ -53,6 +53,8 @@ def get_cropped_satellite_image(loc, idx_raw, N_pixels, upsampling, app=None, fi
 		"east": np.amax([idx_GPS_top[1], idx_GPS_bottom[1]])
 	}
 
+	# print(required_bounds)
+	# {'south': 51.45094186123943, 'west': -2.6078918259586525, 'north': 51.45121412892701, 'east': -2.6074061502428316}
 
 	# Example usage
 	latitude = loc[0]
@@ -113,4 +115,4 @@ def get_cropped_satellite_image(loc, idx_raw, N_pixels, upsampling, app=None, fi
 	cropped_img.save(f"images/satellite_image_cropped{timestamp}.png")
 
 
-	return cropped_img
+	return cropped_img, required_bounds

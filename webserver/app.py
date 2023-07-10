@@ -8,6 +8,7 @@ import numpy as np
 app = Flask(__name__)
 
 coordinates_file = 'coordinates.txt'
+process_runner = processes.process_runner()
 
 
 @app.route('/record_coordinates', methods=['POST'])
@@ -22,7 +23,7 @@ def record_coordinates():
 
 	print(f'Recorded coordinates: {x}, {y}')
 
-	processes.plot_polygon(coordinates_file)
+	process_runner.plot_polygon(coordinates_file)
 
 	return jsonify({'message': 'Coordinates recorded successfully'})
 
@@ -45,7 +46,7 @@ def api_process():
 	
 	if input_location_string:
 	
-		file_path = processes.run_process(input_location_string)
+		file_path = process_runner.run_process(input_location_string)
 
 		image = Image.open(file_path)
 		image_buffer = io.BytesIO()
@@ -61,7 +62,7 @@ def api_process():
 def process():
 	input_location_string = request.form['location']
 	clear_coordinates()
-	file_path = processes.run_process(input_location_string)
+	file_path = process_runner.run_process(input_location_string)
 	return render_template('index.html', file_path=file_path)
 
 @app.route('/images/<path:filename>')
