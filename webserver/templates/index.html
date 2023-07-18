@@ -19,12 +19,18 @@
             z-index: 10; /* Increase the z-index to overlay the polygon on top of the image */
         }
 
-        #output-image button {
+        #output-image .button-wrapper {
             position: absolute;
             bottom: 10px; /* adjust the position as needed */
             right: 10px; /* adjust the position as needed */
             z-index: 10; /* ensure the button is above other elements */
         }
+
+        #output-image button {
+            margin-bottom: 5px; /* add some spacing between the buttons */
+        }
+
+
 
         #garden-image {
             float: left;
@@ -55,19 +61,34 @@
             </a>
             <div id="marker-container"></div>
             <canvas id="polygon"></canvas>
-            <button onclick="clearMarkers()">Clear Markers</button>
+            <div class="button-wrapper">
+                <button id="button1" onclick="clearMarkers()">Clear Markers</button>
+                <button id="button2" onclick="proccessPolygon()">Process polygon</button>
+            </div>
         </div>
-        <div id="garden-image">
-            <img src="{{ url_for('serve_garden_image', filename=file_path) }}" alt="Garden Image">
-        </div>
-        <!-- <button onclick="clearMarkers()">Clear Markers</button> -->
     {% endif %}
+    
 
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script>
+        
         var markers = [];
         var polygon;
 
+        function proccessPolygon() {
+        // Clear the coordinates file
+        $.ajax({
+            type: 'POST',
+            url: '/processPolygon',
+            success: function (response) {
+                console.log(response);
+                window.location.href = "/generated_image?file_path=" + response.file_path;
+            },
+            dataType: 'json' // Specify the expected response data type as JSON
+        });
+    }
+        
+        
         function handleImageClick(event) {
 
             event.preventDefault();
@@ -174,5 +195,6 @@
         }
     </script>
 </body>
+
 </html>
 

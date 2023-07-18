@@ -57,6 +57,9 @@ class process_runner():
 	compute_size = []	
 	timestamp = ''
 
+	def get_new_timestamp(self):
+		return int(time.time())
+	
 	def run_process(self, input_location_string, API=False):
 
 		root_dir = os.getcwd()
@@ -147,7 +150,7 @@ class process_runner():
 
 		return self.image_fileName
 
-	def run_garden_analysis(self, boundaries_pixels):
+	def run_garden_analysis(self, boundaries_pixels, timestamp=None):
 
 		sun_image = Image.open(self.image_fileName)
 		image_width = sun_image.width
@@ -159,7 +162,8 @@ class process_runner():
 
 		sun_frac, garden_map = sunTrapp.plotting.analyse_garden(self.shadows, boundaries_pixels)
 
-		self.garden_fileName = f'images/garden{self.timestamp}.png'
+		if timestamp: self.garden_fileName = f'images/garden{timestamp}.png'
+		else: self.garden_fileName = f'images/garden{self.timestamp}.png'
 
 		plt.figure(figsize=(self.width,self.height))
 
@@ -176,10 +180,12 @@ class process_runner():
 	
 
 
-	def plot_polygon(self, coordinates_file):
+	def plot_polygon(self, coordinates_file, timestamp=None):
 
 		coordinates_array = np.loadtxt(coordinates_file, delimiter=',')
 
 		if np.shape(coordinates_array)[0] > 2:
-			fileName = self.run_garden_analysis(coordinates_array)	
-			return fileName
+			fileName = self.run_garden_analysis(coordinates_array, timestamp)	
+			return True, fileName
+		
+		return False, False

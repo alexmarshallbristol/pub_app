@@ -4,6 +4,8 @@ from flask import jsonify
 import io
 import processes
 import numpy as np
+import os
+import glob
 
 app = Flask(__name__)
 
@@ -23,9 +25,24 @@ def record_coordinates():
 
 	print(f'Recorded coordinates: {x}, {y}')
 
-	process_runner.plot_polygon(coordinates_file)
 
 	return jsonify({'message': 'Coordinates recorded successfully'})
+
+@app.route('/processPolygon', methods=['POST'])
+def processPolygon():
+	root_dir = os.getcwd()
+	files = glob.glob(os.path.join(root_dir, f'images/garden*.png'))
+	for file in files:
+		os.remove(file)
+	timestamp = process_runner.get_new_timestamp()
+	publish, file_name = process_runner.plot_polygon(coordinates_file, timestamp)
+	return jsonify(file_path=file_name)
+
+@app.route('/generated_image')
+def generated_image():
+	file_path = request.args.get('file_path')
+	return render_template('generated_image.html', file_path=file_path)
+
 
 @app.route('/clear_coordinates', methods=['POST'])
 def clear_coordinates():
@@ -36,9 +53,13 @@ def clear_coordinates():
 
 	return jsonify({'message': 'Coordinates file cleared successfully'})
 
+
+
 @app.route('/')
 def home():
 	return render_template('index.html')
+
+
 
 @app.route('/api/process', methods=['GET'])
 def api_process():
@@ -68,11 +89,6 @@ def process():
 @app.route('/images/<path:filename>')
 def serve_image(filename):
 	return send_file(f'{filename}')
-
-@app.route('/graphics/<path:filename>')
-def serve_garden_image(filename):
-	return send_file('graphics/no_response.png')
-
 
 
 if __name__ == '__main__':

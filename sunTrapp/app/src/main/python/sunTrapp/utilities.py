@@ -288,6 +288,38 @@ def index_tif_files(fileNames, json_filepath):
 	with open(json_filepath, "w") as json_file:
 		json.dump(bounds, json_file)
 
+def index_tif_file(file):
+	
+	bounds = {}
+
+	tif_i_data, tif_i_transform, tif_i_dataset = open_tif_file(file)
+
+	# Get the raster dimensions
+	width = tif_i_dataset.width
+	height = tif_i_dataset.height
+
+	# Calculate the GPS coordinates of the four corners
+	top_left = tif_i_transform * (0, 0)  # Multiply transform with pixel indices
+	top_right = tif_i_transform * (width, 0)
+	bottom_left = tif_i_transform * (0, height)
+	bottom_right = tif_i_transform * (width, height)
+
+	transformer_toGPS = Transformer.from_crs("EPSG:27700", "EPSG:4326")
+	top_left = transformer_toGPS.transform(top_left[0], top_left[1])
+	top_right = transformer_toGPS.transform(top_right[0], top_right[1])
+	bottom_left = transformer_toGPS.transform(bottom_left[0], bottom_left[1])
+	bottom_right = transformer_toGPS.transform(bottom_right[0], bottom_right[1])
+	
+	bounds[file] = {}
+	bounds[file]["top_left"] = top_left
+	bounds[file]["top_right"] = top_right
+	bounds[file]["bottom_left"] = bottom_left
+	bounds[file]["bottom_right"] = bottom_right
+	bounds[file]["width"] = width
+	bounds[file]["height"] = height
+
+	return bounds
+
 
 def copy_npy(fileNames, save_filepath):
 
