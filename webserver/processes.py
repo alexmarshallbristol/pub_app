@@ -31,7 +31,8 @@ load_tif_from_png = True
 
 
 def query_google_maps_search(display_string):
-		
+	
+	# https://maps.googleapis.com/maps/api/geocode/json?address=The Bees In The Wall cambridge&key=AIzaSyBbngN_VCGUbLyOBYpn1FepIDJYCsmr-GA
 	api_key = "AIzaSyBbngN_VCGUbLyOBYpn1FepIDJYCsmr-GA"
 	address = display_string
 	url = f"https://maps.googleapis.com/maps/api/geocode/json?address={address}&key={api_key}"
@@ -40,6 +41,7 @@ def query_google_maps_search(display_string):
 	except:
 		return [0., 0.]
 	data = response.json()
+
 	if data["status"] == "OK":
 		location = data["results"][0]["geometry"]["location"]
 		latitude = location["lat"]

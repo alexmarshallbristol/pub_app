@@ -110,7 +110,7 @@ def __celery__run_process(input_location_string):
 def process():
     input_location_string = request.form['location']
     clear_coordinates()
-    task = __celery__run_process.apply_async(args=[input_location_string])
+    task = __celery__run_process.apply_async(args=[input_location_string], retry=True)
 	
     # Return the task ID to the client so it can query the status later
     return render_template('index.html', task_id=task.id)
