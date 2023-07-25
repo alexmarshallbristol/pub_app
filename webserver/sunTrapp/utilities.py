@@ -340,13 +340,12 @@ def get_organised_data_from_png(loc, compute_size, edge_buffer, max_shadow_lengt
 	bottom_left = transformer_toGPS.transform(bottom_left[0], bottom_left[1])
 	bottom_right = transformer_toGPS.transform(bottom_right[0], bottom_right[1])
 
-	if not bounds:
-		if app:
-			with open(join(dirname(file_app), "bounds.json"), "r") as json_file:
-				bounds = json.load(json_file)
-		else:
-			with open("tif/bounds.json", "r") as json_file:
-				bounds = json.load(json_file)
+	if app:
+		with open(join(dirname(file_app), "bounds.json"), "r") as json_file:
+			bounds = json.load(json_file)
+	else:
+		with open("tif/bounds.json", "r") as json_file:
+			bounds = json.load(json_file)
 
 	corners = {}
 	corners["top_left"] = check_coordinate_within_bounds(top_left, bounds[file])
@@ -735,8 +734,8 @@ def download_png(latitude, longitude, output_location= "/Users/am13743/Desktop/p
 		with open(f"{output_location}/bounds.json", 'w') as file:
 			json.dump(data, file, indent=4)
 
-	# print("rm tif file")
-	# os.system(f'rm {file_name}')
+	print("rm tif file")
+	os.system(f'rm {file_name}')
 
 
 
@@ -769,6 +768,11 @@ def download_png(latitude, longitude, output_location= "/Users/am13743/Desktop/p
 	np.save(f'{output_location}/{file_name_no_tif}.npy',np.asarray([min_value, max_value]))
 	os.system(f'ls -lh {output_location}/{file_name_no_tif}.png')     
 
+	del image
+	del normalized_array
+	del tif_i_data
+	del array
+	
 	return file_name_no_tif+".tif"
 
 def get_file_name_from_latlong(latitude, longitude, viewer=False):

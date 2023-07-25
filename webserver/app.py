@@ -6,8 +6,18 @@ import processes
 import numpy as np
 import os
 import glob
+from celery import Celery
+from celery.result import AsyncResult
+from celery import states
+import time
 
 app = Flask(__name__)
+app.config["CELERY_BROKER_URL"] = "redis://localhost:6379"
+
+celery = Celery(app.name, broker=app.config["CELERY_BROKER_URL"], backend='rpc://')
+celery.conf.update(app.config)
+
+
 
 coordinates_file = 'coordinates.txt'
 process_runner = processes.process_runner()
@@ -78,21 +88,36 @@ def api_process():
 		return send_file(image_buffer, mimetype='image/png')
 
 	return 'No input text provided'
+# http://127.0.0.1:5000/api/process?location=50.911794092395404, -0.9654510884959012
 
-# @app.route('/process', methods=['POST'])
-# def process():
-# 	input_location_string = request.form['location']
-# 	clear_coordinates()
-# 	file_path = process_runner.run_process(input_location_string)
-# 	return render_template('index.html', file_path=file_path)
 
+
+
+
+
+@celery.task()
+def __celery__run_process(input_location_string):
+    try:
+        __celery__run_process.update_state(state=states.STARTED)
+        file_path = process_runner.run_process(input_location_string)
+        __celery__run_process.update_state(state=states.SUCCESS, meta={'file_path': file_path})
+        return file_path
+    except Exception as e:
+        __celery__run_process.update_state(state=states.FAILURE, meta={'error_message': str(e)})
+        raise
 
 @app.route('/process', methods=['POST'])
 def process():
-	input_location_string = request.form['location']
-	clear_coordinates()
-	file_path = process_runner.run_process(input_location_string)
-	return render_template('index.html', file_path=file_path)
+    input_location_string = request.form['location']
+    clear_coordinates()
+    task = __celery__run_process.apply_async(args=[input_location_string])
+	
+    # Return the task ID to the client so it can query the status later
+    return render_template('index.html', task_id=task.id)
+
+
+
+
 
 
 
@@ -102,7 +127,4 @@ def serve_image(filename):
 
 
 if __name__ == '__main__':
-	# host = '0.0.0.0'  # Set to '0.0.0.0' to make the server accessible externally
-	# port = 8080  # Set to the desired port number
-	# app.run(host=host, port=port)
 	app.run(debug=True)

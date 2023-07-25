@@ -129,9 +129,13 @@ class process_runner():
 
 		file_path = f'images/satellite_image_cropped{self.timestamp}.png'
 
+		print("Have cropped satellite image...")
+
 		### ok 
 		shadow_calculator = sunTrapp.shadow_computer.shadow_computer(date, time_string, self.loc[0], self.loc[1], max_shadow_length, self.upsampling)
 		self.shadows, region_of_interest = shadow_calculator.compute(data, x_idx, y_idx, self.compute_size, edge_buffer, self.upsampling)
+
+		print("Have shadows...")
 
 		self.shadows = sunTrapp.image_tools.smooth_image(self.shadows)
 
@@ -158,7 +162,7 @@ class process_runner():
 			plt.text(0.01, 0.83, f'Search: {input_location_string}', fontsize=20, horizontalalignment='left',verticalalignment='top', transform=ax.transAxes, c='w')
 		
 		plt.subplots_adjust(hspace=0,wspace=0)
-		plt.tight_layout()        
+		plt.tight_layout()
 		plt.savefig(self.image_fileName, transparent=True, pad_inches=0)
 		plt.close('all')
 
