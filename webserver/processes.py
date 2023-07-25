@@ -22,12 +22,18 @@ shade_color = '#121110'  # Darker blue color for shade
 colors = [shade_color,sun_color]
 cmap = LinearSegmentedColormap.from_list('sun_shade_cmap', colors)
 
-__file__ = '/Users/am13743/Desktop/pub_gardens/sunTrapp/app/src/main/python/BUFFER'
+# __file__ = '/Users/am13743/Desktop/pub_gardens/sunTrapp/app/src/main/python/BUFFER'
+# load_tif_from_png = False
+
+__file__ = '/Users/am13743/Desktop/pub_gardens/tifs_as_png/BUFFER'
+load_tif_from_png = True
+
+
 
 def query_google_maps_search(display_string):
 		
 	api_key = "AIzaSyBbngN_VCGUbLyOBYpn1FepIDJYCsmr-GA"
-	address = display_string+", bristol"
+	address = display_string
 	url = f"https://maps.googleapis.com/maps/api/geocode/json?address={address}&key={api_key}"
 	try:
 		response = requests.get(url)
@@ -75,8 +81,8 @@ class process_runner():
 		self.loc = [float(latlong[0]), float(latlong[1])]
 
 		max_shadow_length = 15
-		# self.compute_size = [35, 35] # area 2N (x, y)
-		self.compute_size = [15, 15] # area 2N (x, y)
+		self.compute_size = [50, 50] # area 2N (x, y)
+		# self.compute_size = [15, 15] # area 2N (x, y)
 		self.compute_size[0] = int(self.compute_size[0]*(410/350))
 		edge_buffer = 5
 		output = f"plot"
@@ -96,7 +102,15 @@ class process_runner():
 
 		print(f"shadow size: {(self.compute_size[0]*2+1)*self.upsampling}, {(self.compute_size[1]*2+1)*self.upsampling}")
 
-		data, self.idx_raw, self.transform, self.centre_indexes = sunTrapp.utilities.get_organised_data(self.loc, self.compute_size, edge_buffer, max_shadow_length, self.upsampling, app=True, file_app=__file__)
+		
+		if load_tif_from_png:
+			data, self.idx_raw, self.transform, self.centre_indexes = sunTrapp.utilities.get_organised_data_from_png(self.loc, self.compute_size, edge_buffer, max_shadow_length, self.upsampling, app=True, file_app=__file__)
+		else:	
+			data, self.idx_raw, self.transform, self.centre_indexes = sunTrapp.utilities.get_organised_data(self.loc, self.compute_size, edge_buffer, max_shadow_length, self.upsampling, app=True, file_app=__file__)
+		
+		# if not data:
+		# 	print("NEED DOWNLOAD")
+		# 	return f'graphics/downloading.png'
 
 		if self.upsampling != 1.:
 			max_shadow_length *= self.upsampling

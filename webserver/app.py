@@ -79,12 +79,22 @@ def api_process():
 
 	return 'No input text provided'
 
+# @app.route('/process', methods=['POST'])
+# def process():
+# 	input_location_string = request.form['location']
+# 	clear_coordinates()
+# 	file_path = process_runner.run_process(input_location_string)
+# 	return render_template('index.html', file_path=file_path)
+
+
 @app.route('/process', methods=['POST'])
 def process():
 	input_location_string = request.form['location']
 	clear_coordinates()
 	file_path = process_runner.run_process(input_location_string)
 	return render_template('index.html', file_path=file_path)
+
+
 
 @app.route('/images/<path:filename>')
 def serve_image(filename):

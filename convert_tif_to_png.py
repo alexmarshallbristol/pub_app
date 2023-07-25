@@ -21,7 +21,7 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.common.action_chains import ActionChains
 from selenium.webdriver.support.ui import Select
 import time
-
+import pickle
 
 # https://environment.data.gov.uk/DefraDataDownload/?Mode=survey
 
@@ -104,6 +104,10 @@ def download_png(latitude, longitude, output_location= "/Users/am13743/Desktop/p
 
 
     # Save the image as a PNG file
+
+    with open(f'{output_location}/{file_name_no_tif}.pkl', 'wb') as handle:
+        pickle.dump(tif_i_transform, handle, protocol=pickle.HIGHEST_PROTOCOL)
+
     image.save(f'{output_location}/{file_name_no_tif}.png')
     np.save(f'{output_location}/{file_name_no_tif}.npy',np.asarray([min_value, max_value]))
     os.system(f'ls -lh {output_location}/{file_name_no_tif}.png')     
@@ -256,8 +260,12 @@ def get_file_name_from_latlong(latitude, longitude, viewer=False):
 
 
 
-latitude = 51.221621878347754
-longitude = -0.34076821157964365
+# latitude = 51.221621878347754
+# longitude = -0.34076821157964365
+latitude = 51.4538171628379
+longitude = -2.595375368607703
+
+
 
 download_png(latitude, longitude, output_location="/Users/am13743/Desktop/pub_gardens/tifs_as_png/", plot=False)
 
